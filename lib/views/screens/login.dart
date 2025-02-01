@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+//import 'package:cloud_firestore/cloud_firestore.dart'; //PARTE DE UNA PRUEBA DEL FUNCIONAMIENTO DE FIRESTORE, PUEDE SERVIR COMO GUIA
 
 class LoginPage extends StatefulWidget {
   @override
@@ -70,6 +71,11 @@ class _LoginPageState extends State<LoginPage> {
                 onPressed: signIn,
                 child: Text('Iniciar Sesión'),
               ),
+              //EL BOTON DE ABAJO ES PARTE DE UNA PRUEBA DEL FUNCIONAMIENTO DE FIRESTORE, PUEDE SERVIR COMO GUIA
+              // ElevatedButton(
+              //   onPressed: addUser,
+              //   child: Text('Crear Usuario'),
+              // ),
             ],
           ),
         ),
@@ -77,3 +83,16 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 }
+
+//LA FUNCION DE ABAJO ES PARTE DE UNA PRUEBA DEL FUNCIONAMIENTO DE FIRESTORE, PUEDE SERVIR COMO GUIA
+// Future<void> addUser() async {
+//   // Obtén una referencia a la colección 'users'
+//   CollectionReference users = FirebaseFirestore.instance.collection('users');
+
+//   // Agrega un nuevo documento con un nombre y correo
+//   await users.add({
+//     'name': 'John Doe',  // Campo 'name'
+//     'email': 'john.doe@example.com',  // Campo 'email'
+//   }).then((value) => print("User Added"))
+//     .catchError((error) => print("Failed to add user: $error"));
+// }
