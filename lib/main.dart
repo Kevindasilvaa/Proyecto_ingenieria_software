@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:hello_flutter/models/dbHelper/firebase_options.dart';
-import 'package:hello_flutter/views/screens/home.dart';
-import 'package:hello_flutter/views/screens/login.dart';
-import 'package:hello_flutter/views/screens/profile.dart';
-import 'package:hello_flutter/views/screens/settings.dart';
+import 'package:moni/controllers/user_controller.dart';
+import 'package:moni/models/dbHelper/firebase_options.dart';
+import 'package:moni/views/screens/CreateAccount.dart';
+import 'package:moni/views/screens/home.dart';
+import 'package:moni/views/screens/login.dart';
+import 'package:moni/views/screens/profile.dart';
+import 'package:moni/views/screens/settings.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -12,7 +15,12 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  runApp(MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => UserController(),  // Crear el UserController
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -21,13 +29,19 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Mi Aplicación',
+      title: 'Moni',
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        scaffoldBackgroundColor: Colors.white, // Color de fondo blanco para las paginas
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.white, // Color de AppBar (titulos) blanco
+        ),
       ),
+      // Rutas de la aplicación
       routes: {
-        '/': (context) => LoginPage(), // Ruta inicial
-        '/home': (context) => HomePage(), // Ruta para la pantalla de inicio
+        '/': (context) => LoginPage(),
+        '/createAccount': (context) => CreateAccountPage(),
+        '/home': (context) => HomePage(),
         '/settings': (context) => SettingsPage(),
         '/profile': (context) => ProfilePage(),
       },

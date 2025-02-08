@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:moni/controllers/user_controller.dart';
+import 'package:moni/models/clases/Usuario.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -7,41 +9,34 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   void initState() {
     super.initState();
-    _auth.authStateChanges().listen((User? user) {
-      if (user == null) {
-        // El usuario ha cerrado sesión o no ha iniciado sesión
-        Navigator.pushNamed(context, '/'); // Navega a la página de login
-        print('User is currently signed out!');
-      } else {
-        // El usuario ha iniciado sesión
-        print('User is signed in!');
-      }
-    });
   }
 
   @override
   Widget build(BuildContext context) {
+    // Aquí accedemos al UserController
+    final userController = Provider.of<UserController>(context);
+    // Esto escuchara cambios en el estado de autenticación de Firebase directamente desde el user_controller
+    userController.startAuthListener(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Mi Aplicación'),
-        // Botón en la esquina superior izquierda
         leading: PopupMenuButton<String>(
-          icon: Icon(Icons.menu), // El ícono de menú
+          icon: Icon(Icons.menu),
           onSelected: (String value) {
             if (value == 'logout') {
-              _logout(); // Realiza logout
+              _logout();
             } else {
-              Navigator.pushNamed(context, value); // Navega a la ruta seleccionada
+              Navigator.pushNamed(context, value);
             }
           },
           itemBuilder: (BuildContext context) => [
             PopupMenuItem<String>(
-              value: '/home', // La ruta a la que redirigir
+              value: '/home',
               child: Row(
                 children: [
                   Icon(Icons.home),
@@ -51,7 +46,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             PopupMenuItem<String>(
-              value: '/profile', // La ruta a la que redirigir
+              value: '/profile',
               child: Row(
                 children: [
                   Icon(Icons.person),
@@ -61,7 +56,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             PopupMenuItem<String>(
-              value: '/settings', // La ruta a la que redirigir
+              value: '/settings',
               child: Row(
                 children: [
                   Icon(Icons.settings),
@@ -71,7 +66,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             PopupMenuItem<String>(
-              value: 'logout', // Este valor indica que es logout, no una ruta
+              value: 'logout',
               child: Row(
                 children: [
                   Icon(Icons.logout),
@@ -84,19 +79,35 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('¡Bienvenido a tu aplicación!'),
-          ],
-        ),
+        child: userController.usuario != null
+            ? Text('¡Bienvenido, ${userController.usuario?.name}!')
+            : CircularProgressIndicator(), // Mientras se obtiene el usuario, mostramos un indicador
       ),
     );
   }
 
-  // Función de logout
+  // Función para cerrar sesion llamando al metodo de user_controller
   Future<void> _logout() async {
-    await _auth.signOut();
+    final userController = Provider.of<UserController>(context, listen: false);
+    await userController.logOut();
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Cierre de sesión exitoso.'),),);
     Navigator.pushNamed(context, '/'); // Redirige a la página de login
+  }
+
+  // Método asíncrono para obtener el usuario
+  Future<void> _getUserData(String email) async {
+    // Accede al UserController usando Provider
+    final userController = Provider.of<UserController>(context, listen: false);
+
+    // Llamar al método del UserController para obtener el usuario
+    Usuario? fetchedUser = await userController.getUserByEmail(email);
+
+    // Si se encontró el usuario, actualizar el estado del user_controller
+    if (fetchedUser != null) {
+      userController.usuario = fetchedUser;
+      print('Usuario encontrado: ${userController.usuario?.email} ${userController.usuario?.name}');
+    } else {
+      print('No se encontró el usuario.');
+    }
   }
 }
