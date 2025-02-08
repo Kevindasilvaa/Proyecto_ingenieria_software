@@ -22,7 +22,7 @@ class CustomButton extends StatelessWidget {
           ),
         ),
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.grey,
+          backgroundColor: Colors.grey[600], //color
           padding: EdgeInsets.symmetric(vertical: 16), // Padding vertical
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),

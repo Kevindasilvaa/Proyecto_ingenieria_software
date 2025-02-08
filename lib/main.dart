@@ -2,12 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:moni/controllers/user_controller.dart';
 import 'package:moni/models/dbHelper/firebase_options.dart';
-import 'package:moni/views/screens/CreateAccount.dart';
+import 'package:moni/views/screens/accounts.dart';
+import 'package:moni/views/screens/categories.dart';
+import 'package:moni/views/screens/incomeOffers.dart';
+import 'package:moni/views/screens/register.dart';
 import 'package:moni/views/screens/home.dart';
 import 'package:moni/views/screens/login.dart';
 import 'package:moni/views/screens/profile.dart';
 import 'package:moni/views/screens/settings.dart';
+import 'package:moni/views/screens/statistics.dart';
+import 'package:moni/views/screens/transactions.dart';
 import 'package:provider/provider.dart';
+import 'package:moni/views/screens/addTransactions.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,10 +46,16 @@ class MyApp extends StatelessWidget {
       // Rutas de la aplicación
       routes: {
         '/': (context) => LoginPage(),
-        '/createAccount': (context) => CreateAccountPage(),
+        '/register': (context) => RegisterPage(),
         '/home': (context) => HomePage(),
         '/settings': (context) => SettingsPage(),
         '/profile': (context) => ProfilePage(),
+        '/addTransactions': (context) => AddTransactionsPage(),
+        '/transactions': (context) => TransactionsPage(),
+        '/statistics': (context) => StatisticsPage(),
+        '/income_offers': (context) => IncomeOffersPage(),
+        '/categories': (context) => CategoriesPage(),
+        '/accounts': (context) => AccountsPage(),
       },
       initialRoute: '/', // Ruta inicial de la aplicación
     );

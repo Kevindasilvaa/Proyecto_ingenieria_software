@@ -97,7 +97,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
               TextButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, '/createAccount'); // Navega a la página de creación de cuenta
+                  Navigator.pushNamed(context, '/register'); // Navega a la página de creación de cuenta
                 },
                 child: Text(
                   '¿No tienes una cuenta? ¡Crea una!',

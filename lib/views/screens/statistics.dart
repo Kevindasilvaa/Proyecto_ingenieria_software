@@ -5,16 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:moni/views/widgets/NavBar.dart';
 import 'package:moni/views/widgets/CustomDrawer.dart';
 
-class HomePage extends StatefulWidget {
-  @override
-  _HomePageState createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  @override
-  void initState() {
-    super.initState();
-  }
+class StatisticsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +15,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.grey[200],
-        title: Text('Home'),
+        title: Text('Estadísticas'),
       ),
       drawer: CustomDrawer(), // Aquí agregamos el Drawer
       body: SafeArea(
@@ -43,19 +34,15 @@ class _HomePageState extends State<HomePage> {
                 onPlusPressed: () {
                   Navigator.of(context).pushNamed('/addTransactions');
                 },
-                currentPage: '/home',
+                currentPage: '/statistics',
               ),
             ),
           ],
         ),
       ),
+
     );
   }
-
-  Future<void> _logout() async {
-    final userController = Provider.of<UserController>(context, listen: false);
-    await userController.logOut();
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Cierre de sesión exitoso.')));
-    Navigator.pushNamed(context, '/');
-  }
 }
+
+

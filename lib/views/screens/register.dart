@@ -4,13 +4,12 @@ import 'package:moni/models/clases/Usuario.dart'; // Importa la clase User
 import 'package:moni/views/widgets/CustomButton.dart';
 import 'package:moni/views/widgets/CustomTextField.dart';
 
-
-class CreateAccountPage extends StatefulWidget { // Renombra la clase a CreateAccountPage
+class RegisterPage extends StatefulWidget { // Renombra la clase a RegisterPage
   @override
-  _CreateAccountPageState createState() => _CreateAccountPageState();
+  _RegisterPageState createState() => _RegisterPageState();
 }
 
-class _CreateAccountPageState extends State<CreateAccountPage> { // Renombra el estado
+class _RegisterPageState extends State<RegisterPage> { // Renombra el estado
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
