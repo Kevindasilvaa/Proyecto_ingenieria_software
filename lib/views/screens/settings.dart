@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:moni/controllers/user_controller.dart';
+import 'package:provider/provider.dart';
+class SettingsPage extends StatefulWidget {
+  @override
+  _SettingsPageState createState() => _SettingsPageState();
+}
 
-class SettingsPage extends StatelessWidget {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-
-  // Función para cerrar sesión
-  Future<void> _logout(BuildContext context) async {
-    await _auth.signOut();
-    Navigator.pushNamed(context, '/'); // Redirige a la página de login
-  }
-
+class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
+    final userController = Provider.of<UserController>(context);
+    
     return Scaffold(
       appBar: AppBar(
         title: Text('Configuraciones'),
@@ -57,11 +56,20 @@ class SettingsPage extends StatelessWidget {
             ListTile(
               leading: Icon(Icons.logout),
               title: Text('Cerrar sesión'),
-              onTap: () => _logout(context),
+              onTap: () => _logout(context), // Pasar el context aquí
             ),
           ],
         ),
       ),
     );
   }
+
+  // Función para cerrar sesión
+  Future<void> _logout(BuildContext context) async {
+    final userController = Provider.of<UserController>(context, listen: false);
+    await userController.logOut();
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Cierre de sesión exitoso.')));
+    Navigator.pushNamed(context, '/');
+  }
 }
+
