@@ -35,7 +35,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final userController = Provider.of<UserController>(context);
-    //Escuchara los cambios en la authentificacion de firebase y actualizara al user_controller
+    
+    // Este método debe ejecutarse solo una vez, al inicio
+    // Verificamos si el usuario ya está autenticado y escuchamos cambios de autenticación
+    // Es importante que lo hagas solo una vez
     userController.startAuthListener(context);
 
     return MaterialApp(
@@ -61,7 +64,7 @@ class MyApp extends StatelessWidget {
         '/categories': (context) => CategoriesPage(),
         '/accounts': (context) => AccountsPage(),
       },
-      initialRoute: '/', // Ruta inicial de la aplicación
+      initialRoute: '/home', // Ruta inicial de la aplicación
     );
   }
 }
