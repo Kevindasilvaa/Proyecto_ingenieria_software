@@ -10,7 +10,6 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     final userController = Provider.of<UserController>(context);
-    userController.startAuthListener(context);
     
     return Scaffold(
       appBar: AppBar(

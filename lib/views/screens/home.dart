@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:moni/controllers/user_controller.dart';
 import 'package:moni/models/clases/Usuario.dart';
@@ -14,12 +15,22 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    // En caso de que el usuario no haya iniciado sesion se redirije a la pagina de login
+    FirebaseAuth.instance
+  .authStateChanges()
+  .listen((User? user) {
+    if (user == null) {
+      print('User is currently signed out!');
+      Navigator.of(context).pushNamed('/');
+    } else {
+      print('User is signed in!');
+    }
+  });
   }
 
   @override
   Widget build(BuildContext context) {
     final userController = Provider.of<UserController>(context);
-    userController.startAuthListener(context);
 
     return Scaffold(
       appBar: AppBar(

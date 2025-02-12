@@ -12,6 +12,33 @@ class UserController with ChangeNotifier {  // Cambié esto a "with ChangeNotifi
   // Getter para acceder al usuario
   Usuario? get usuario => _usuario;
 
+  bool _isListening = false; // Flag para evitar registro repetido
+
+  // Escuchar cambios en el estado de autenticación y actualizar la variable usuario
+  void startAuthListener(BuildContext context) {
+    if (_isListening) return;  // No registrar el listener si ya está registrado
+    _isListening = true;  // Marcar que el listener está activo
+
+    final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+
+    // El listener de los cambios de estado de autenticación
+    _firebaseAuth.authStateChanges().listen((User? firebaseUser) async {
+      if (firebaseUser == null) {
+        // El usuario ha cerrado sesión
+        print("El usuario cerró sesión");
+        _usuario = null;
+      } else {
+        // El usuario ha iniciado sesión
+        print("El usuario inició sesión");
+        final user = await getUserByEmail(firebaseUser.email!); // Traer datos adicionales del usuario
+        _usuario = user;
+      }
+
+      // Notificar a los listeners para actualizar la UI
+      notifyListeners();
+    });
+  }
+
   // Setter para actualizar el usuario
   set usuario(Usuario? nuevoUsuario) {
     _usuario = nuevoUsuario;
@@ -76,22 +103,5 @@ class UserController with ChangeNotifier {  // Cambié esto a "with ChangeNotifi
       print('Error al cerrar sesión: $e');
       rethrow;
     }
-  }
-
-  // Escuchar cambios en el estado de autenticación
-  void startAuthListener(BuildContext context) {
-    final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-    _firebaseAuth.authStateChanges().listen((User? firebaseUser) async {
-      if (firebaseUser == null) {
-        // El usuario ha cerrado sesión
-        _usuario = null;
-        notifyListeners();
-      } else {
-        // El usuario ha iniciado sesión
-        final user = await getUserByEmail(firebaseUser.email!); // Traer datos adicionales del usuario
-        _usuario = user;
-        notifyListeners();
-      }
-    });
   }
 }
