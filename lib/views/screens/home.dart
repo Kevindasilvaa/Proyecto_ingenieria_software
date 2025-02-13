@@ -68,41 +68,39 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class TransaccionesView extends StatefulWidget {
-  @override
-  _TransaccionesViewState createState() => _TransaccionesViewState();
-}
-
-class _TransaccionesViewState extends State<TransaccionesView> {
+// Muestra las 3 ultimas transacciones segun su fecha
+class TransaccionesView extends StatelessWidget { // Cambiado a StatelessWidget
   final TransaccionesController _controller = TransaccionesController();
-  List<Transaccion> _transacciones = []; 
-
-  @override
-  void initState() {
-    super.initState();
-    _cargarTransacciones();
-  }
-
-  Future<void> _cargarTransacciones() async {
-    _transacciones = await _controller.obtenerTransaccionesUsuario();
-    setState(() {});
-  }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          child: ListView.builder(
-            itemCount: _transacciones.length,
+    return StreamBuilder<List<Transaccion>>( // Usamos StreamBuilder
+      stream: _controller.obtenerTransaccionesUsuarioStream(), // Escuchamos el stream
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator()); // Mientras carga
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}')); // Si hay error
+        } else if (snapshot.data == null || snapshot.data!.isEmpty) {
+          return Center(child: Text('No hay transacciones')); // Si no hay datos
+        } else {
+          final transacciones = snapshot.data!;
+
+          // Ordena las transacciones por fecha de forma descendente (las más recientes primero)
+          transacciones.sort((a, b) => b.fecha.compareTo(a.fecha));
+
+          // Toma solo las últimas 3 transacciones
+          final ultimasTransacciones = transacciones.take(3).toList();
+
+          return ListView.builder(
+            itemCount: ultimasTransacciones.length,
             itemBuilder: (context, index) {
-              final transaccion = _transacciones[index];
+              final transaccion = ultimasTransacciones[index];
               return ListTile(
                 title: Text(transaccion.nombre),
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-
                     Text('Categoría: ${transaccion.categoria}'),
                     Text('Monto: ${transaccion.monto}'),
                     Text('Ingreso: ${transaccion.ingreso}'),
@@ -111,9 +109,9 @@ class _TransaccionesViewState extends State<TransaccionesView> {
                 ),
               );
             },
-          ),
-        ),
-      ],
+          );
+        }
+      },
     );
   }
 }

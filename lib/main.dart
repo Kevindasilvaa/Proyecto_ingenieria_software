@@ -22,8 +22,11 @@ void main() async {
   );
 
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => UserController(),  // Crear el UserController
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => UserController()),
+        // ... otros providers
+      ],
       child: MyApp(),
     ),
   );

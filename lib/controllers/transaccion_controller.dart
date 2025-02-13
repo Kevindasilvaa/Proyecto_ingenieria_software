@@ -5,29 +5,25 @@ import 'package:moni/models/clases/transaccion.dart';
 class TransaccionesController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<List<Transaccion>> obtenerTransaccionesUsuario() async {
+  Stream<List<Transaccion>> obtenerTransaccionesUsuarioStream() {
     final FirebaseAuth _auth = FirebaseAuth.instance;
-    final User? _user = _auth.currentUser; // Obtiene el usuario actual (puede ser nulo)
+    final User? _user = _auth.currentUser;
 
-    if (_user == null) { // Verifica si el usuario es nulo
-      return []; // Retorna una lista vacía si no hay usuario
+    if (_user == null) {
+      return Stream.empty(); // Retorna un stream vacío si no hay usuario
     }
 
-    try {
-      QuerySnapshot querySnapshot = await _firestore
-          .collection('transaction')
-          .where('user_id', isEqualTo: _user.uid) // Usa _user.uid
-          .get();
-
+    return _firestore
+        .collection('transaction')
+        .where('user_id', isEqualTo: _user.uid)
+        .snapshots() // Escucha los cambios en tiempo real
+        .map((snapshot) {
       List<Transaccion> transacciones = [];
-      for (var doc in querySnapshot.docs) {
+      for (var doc in snapshot.docs) {
         transacciones.add(Transaccion.fromMap(doc.data() as Map<String, dynamic>, doc.id));
       }
       return transacciones;
-    } catch (e) {
-      print('Error al obtener transacciones: $e');
-      return [];
-    }
+    });
   }
 
   Future<void> agregarTransaccion(Transaccion transaccion) async {
