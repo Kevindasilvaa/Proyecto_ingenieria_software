@@ -39,7 +39,7 @@ class _ProfilePageState extends State<ProfilePage> {
       _birthdateController.text = user.birthdate != null
           ? DateFormat.yMd().format(user.birthdate!)
           : 'No disponible';
-      _countryController.text = user.country ?? 'No disponible';
+      _countryController.text = user.country ?? 'Dejar campo vacio';
       _phoneController.text = user.phone_number ?? 'No disponible';
     }
   }
