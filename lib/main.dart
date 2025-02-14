@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:moni/controllers/user_controller.dart';
 import 'package:moni/controllers/category_controller.dart';
+import 'package:moni/controllers/cuenta_controller.dart';
 import 'package:moni/models/dbHelper/firebase_options.dart';
 import 'package:moni/views/screens/accounts.dart';
 import 'package:moni/views/screens/categories.dart';
@@ -27,6 +28,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => UserController()),
         ChangeNotifierProvider(create: (_) => CategoryController()),
+        ChangeNotifierProvider(create: (_) => CuentaController()),
         // ... otros providers
       ],
       child: MyApp(),
