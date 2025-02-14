@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:moni/models/dbHelper/firebase_service.dart';
 import 'package:moni/models/clases/Usuario.dart';
@@ -104,4 +105,17 @@ class UserController with ChangeNotifier {  // Cambié esto a "with ChangeNotifi
       rethrow;
     }
   }
+
+  // En user_controller.dart
+Future<void> actualizarUsuarioEnFirestore(Usuario usuario) async {
+  try {
+    await FirebaseFirestore.instance
+        .collection('users') // Reemplaza 'users' con tu colección
+        .doc(usuario.id)
+        .update(usuario.toMap()); // Usa el método toMap de tu clase Usuario
+  } catch (e) {
+    print('Error al actualizar usuario en Firestore: $e');
+    rethrow; // Re-lanza el error para que se pueda manejar en la UI
+  }
+}
 }

@@ -4,7 +4,7 @@ class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
   final String labelText;
   final String hintText;
-  final IconData prefixIcon;
+  final IconData? prefixIcon;
   final IconData? suffixIcon;
   final TextInputType keyboardType;
   final String? Function(String?)? validator;
@@ -15,7 +15,7 @@ class CustomTextField extends StatelessWidget {
     required this.controller,
     required this.labelText,
     required this.hintText,
-    required this.prefixIcon,
+    this.prefixIcon,
     this.suffixIcon,
     this.keyboardType = TextInputType.text,
     this.validator,
@@ -46,10 +46,10 @@ class CustomTextField extends StatelessWidget {
             hintStyle: TextStyle(
               color: Colors.grey,
             ),
-            prefixIcon: Icon(
+            prefixIcon: prefixIcon != null ? Icon(
               prefixIcon,
               color: Colors.grey,
-            ),
+            ) : null, // Condicional para mostrar el icono
             suffixIcon: suffixIcon != null
                 ? IconButton(
                     onPressed: onSuffixIconTap,
