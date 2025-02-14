@@ -244,20 +244,22 @@ class CategoriesPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ElevatedButton(
-              onPressed: () =>
-                  _showCreateCategoryDialog(context, categoryController),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey[300],
-                foregroundColor: Colors.black,
-                padding: EdgeInsets.symmetric(vertical: 14, horizontal: 32),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+            Center(
+              child: ElevatedButton(
+                onPressed: () =>
+                    _showCreateCategoryDialog(context, categoryController),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.grey[300],
+                  foregroundColor: Colors.black,
+                  padding: EdgeInsets.symmetric(vertical: 14, horizontal: 32),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                 ),
-              ),
-              child: Text(
-                'Crear Categoría',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                child: Text(
+                  'Crear Categoría',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
               ),
             ),
             SizedBox(height: 25),
@@ -412,41 +414,40 @@ class CategoriesPage extends StatelessWidget {
   }
 
   void _showDeleteConfirmationDialog(BuildContext context,
-    CategoryController categoryController, String categoryId) {
-  // Obtener la categoría antes de mostrar el diálogo para verificar su email
-  categoryController.getCategoryById(categoryId).then((category) {
-    if (category?.user_email == 'all_users@domain.com') {
-      // Si la categoría es global, no permitir eliminarla
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('No puedes eliminar una categoría global.')));
-    } else {
-      // Si no es global, permitir la eliminación
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text('Eliminar Categoría'),
-            content: Text('¿Seguro que deseas eliminar esta categoría?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text('Cancelar'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  categoryController.deleteCategory(categoryId).then((_) {
-                    Navigator.pop(context); // Cerrar el diálogo
-                  });
-                },
-                child: Text('Eliminar'),
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-              ),
-            ],
-          );
-        },
-      );
-    }
-  });
-}
-
+      CategoryController categoryController, String categoryId) {
+    // Obtener la categoría antes de mostrar el diálogo para verificar su email
+    categoryController.getCategoryById(categoryId).then((category) {
+      if (category?.user_email == 'all_users@domain.com') {
+        // Si la categoría es global, no permitir eliminarla
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('No puedes eliminar una categoría global.')));
+      } else {
+        // Si no es global, permitir la eliminación
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text('Eliminar Categoría'),
+              content: Text('¿Seguro que deseas eliminar esta categoría?'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text('Cancelar'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    categoryController.deleteCategory(categoryId).then((_) {
+                      Navigator.pop(context); // Cerrar el diálogo
+                    });
+                  },
+                  child: Text('Eliminar'),
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    });
+  }
 }
