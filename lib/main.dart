@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:moni/controllers/user_controller.dart';
+import 'package:moni/controllers/category_controller.dart';
 import 'package:moni/models/dbHelper/firebase_options.dart';
 import 'package:moni/views/screens/accounts.dart';
 import 'package:moni/views/screens/categories.dart';
@@ -25,6 +26,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => UserController()),
+        ChangeNotifierProvider(create: (_) => CategoryController()),
         // ... otros providers
       ],
       child: MyApp(),
@@ -38,7 +40,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final userController = Provider.of<UserController>(context);
-    
+
     // Este método debe ejecutarse solo una vez, al inicio
     // Verificamos si el usuario ya está autenticado y escuchamos cambios de autenticación
     // Es importante que lo hagas solo una vez
@@ -48,7 +50,8 @@ class MyApp extends StatelessWidget {
       title: 'Moni',
       theme: ThemeData(
         primarySwatch: Colors.blue,
-        scaffoldBackgroundColor: Colors.white, // Color de fondo blanco para las paginas
+        scaffoldBackgroundColor:
+            Colors.white, // Color de fondo blanco para las paginas
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.white, // Color de AppBar (titulos) blanco
         ),
