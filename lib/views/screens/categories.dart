@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:moni/views/widgets/CustomDrawer.dart';
 import 'package:provider/provider.dart';
-import 'package:moni/controllers/category_Controller.dart';
+import 'package:moni/controllers/category_controller.dart';
 import 'package:moni/models/clases/category.dart';
 import 'package:moni/views/widgets/CategoryButton.dart';
 
