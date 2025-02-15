@@ -11,10 +11,12 @@ import 'package:moni/models/clases/cuenta.dart';
 class AccountsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    // Accedemos al controlador de usuario para obtener el email
     final userController = Provider.of<UserController>(context);
-    final cuentaController =
-        Provider.of<CuentaController>(context, listen: false);
-    final userId = userController.usuario?.id;
+    final cuentaController = Provider.of<CuentaController>(context, listen: false);
+    
+    // Aquí accedemos al correo del usuario desde el controlador
+    final userEmail = userController.usuario?.email; 
 
     return Scaffold(
       appBar: AppBar(
@@ -41,17 +43,22 @@ class AccountsPage extends StatelessWidget {
 
             // Lista de cuentas
             Expanded(
-              child: userId != null
+              child: userEmail != null
                   ? Consumer<CuentaController>(
                       builder: (context, cuentaController, child) {
-                        if (cuentaController.cuentas.isEmpty) {
+                        // Filtramos las cuentas por userEmail
+                        final cuentasDelUsuario = cuentaController.cuentas
+                            .where((cuenta) => cuenta.userEmail == userEmail)
+                            .toList();
+
+                        if (cuentasDelUsuario.isEmpty) {
                           return Center(child: Text('No tienes cuentas aún.'));
                         }
 
                         return ListView.builder(
-                          itemCount: cuentaController.cuentas.length,
+                          itemCount: cuentasDelUsuario.length,
                           itemBuilder: (context, index) {
-                            Cuenta cuenta = cuentaController.cuentas[index];
+                            Cuenta cuenta = cuentasDelUsuario[index];
                             return Card(
                               margin: EdgeInsets.symmetric(
                                   horizontal: 16, vertical: 8),
@@ -61,7 +68,7 @@ class AccountsPage extends StatelessWidget {
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold)),
                                 subtitle: Text(
-                                    '${cuenta.tipo} - \$${cuenta.saldo.toStringAsFixed(2)}'),
+                                    '${cuenta.tipo} - ${cuenta.tipoMoneda} - \$${cuenta.saldo.toStringAsFixed(2)}'),
                                 leading: Icon(Icons.account_balance_wallet,
                                     color: Colors.blue),
                               ),
@@ -77,14 +84,14 @@ class AccountsPage extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: AddAccountButton(
-                userId: userId ?? '',
+                // Usamos el email del usuario desde el controlador
                 onAdd: () {
-                  if (userId?.isNotEmpty ?? false) {
+                  if (userEmail?.isNotEmpty ?? false) {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                           builder: (context) =>
-                              AddAccountPage(userId: userId ?? '')),
+                              AddAccountPage()),
                     );
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(

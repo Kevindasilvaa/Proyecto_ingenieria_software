@@ -2,12 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:moni/models/clases/cuenta.dart';
 import 'package:moni/controllers/cuenta_controller.dart';
+import 'package:moni/controllers/user_controller.dart';
 
 class AddAccountPage extends StatefulWidget {
-  final String userId;
-
-  const AddAccountPage({Key? key, required this.userId}) : super(key: key);
-
   @override
   _AddAccountPageState createState() => _AddAccountPageState();
 }
@@ -17,9 +14,22 @@ class _AddAccountPageState extends State<AddAccountPage> {
   String _nombre = '';
   String _tipo = 'Ahorro';
   double _saldo = 0.0;
+  String _tipoMoneda = 'USD'; // Puedes ajustar las opciones de moneda
+  String _idCuenta = ''; // Puede generar un ID único o usar un valor predeterminado
 
   @override
   Widget build(BuildContext context) {
+    final userController = Provider.of<UserController>(context);
+    final userEmail = userController.usuario?.email;
+
+    if (userEmail == null) {
+      return Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(title: Text('Agregar Cuenta')),
       body: Padding(
@@ -47,6 +57,17 @@ class _AddAccountPageState extends State<AddAccountPage> {
                     .toList(),
               ),
 
+              // Tipo de moneda
+              DropdownButtonFormField<String>(
+                decoration: InputDecoration(labelText: 'Tipo de moneda'),
+                value: _tipoMoneda,
+                onChanged: (value) => setState(() => _tipoMoneda = value!),
+                items: ['USD', 'EUR', 'MXN'] // Opciones de moneda
+                    .map((moneda) =>
+                        DropdownMenuItem(value: moneda, child: Text(moneda)))
+                    .toList(),
+              ),
+
               // Saldo inicial
               TextFormField(
                 decoration: InputDecoration(labelText: 'Saldo inicial'),
@@ -70,16 +91,20 @@ class _AddAccountPageState extends State<AddAccountPage> {
               ElevatedButton(
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
+                    // Crear la nueva cuenta con los nuevos atributos
                     Cuenta nuevaCuenta = Cuenta(
-                      id: '',
                       nombre: _nombre,
                       tipo: _tipo,
                       saldo: _saldo,
                       fechaCreacion: DateTime.now(),
+                      userEmail: userEmail, // Usar el correo del usuario
+                      tipoMoneda: _tipoMoneda, // El tipo de moneda seleccionado
+                      idCuenta: _idCuenta, // Si es necesario, generar un ID único
                     );
 
+                    // Agregar la cuenta utilizando el controlador
                     await Provider.of<CuentaController>(context, listen: false)
-                        .agregarCuenta(widget.userId, nuevaCuenta);
+                        .agregarCuenta(nuevaCuenta);
 
                     Navigator.pop(context);
                   }

@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:moni/controllers/user_controller.dart'; // Asegúrate de importar el controlador
 
 class AddAccountButton extends StatelessWidget {
-  final String userId;
   final VoidCallback onAdd;
 
   const AddAccountButton({
-    required this.userId,
     required this.onAdd,
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    // Accedemos al controlador UserController para obtener el email
+    final userController = Provider.of<UserController>(context);
+    final userEmail = userController.usuario?.email; // Aquí accedemos al email
+
     return Container(
       margin: EdgeInsets.symmetric(vertical: 8),
       padding: EdgeInsets.all(12),
@@ -50,7 +54,18 @@ class AddAccountButton extends StatelessWidget {
           ),
           IconButton(
             icon: Icon(Icons.add, color: Colors.blue),
-            onPressed: onAdd,
+            onPressed: () {
+              if (userEmail?.isNotEmpty ?? false) {
+                onAdd();
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Inicia sesión para agregar cuentas'),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              }
+            },
           ),
         ],
       ),

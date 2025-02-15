@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:moni/models/clases/Usuario.dart'; // Importa la clase User
 import 'package:moni/models/clases/cuenta.dart';
+import 'dart:math';
 
 class FirebaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -99,36 +100,30 @@ class FirebaseService {
     }
   }
 
-//  AGREGAR UNA CUENTA A FIRESTORE
-  Future<void> agregarCuenta(String userId, Cuenta cuenta) async {
-    try {
-      await _firestore
-          .collection('accounts') // Colección principal de cuentas
-          .doc(userId) // Documento del usuario
-          .collection('user_accounts') // Subcolección de cuentas del usuario
-          .add(cuenta.toMap()); // Agregar cuenta
-    } catch (e) {
-      print('Error al agregar cuenta: $e');
-      rethrow;
-    }
+// AGREGAR UNA CUENTA A FIRESTORE
+Future<void> agregarCuenta(Cuenta cuenta) async {
+  try {
+    await _firestore.collection('accounts').add(cuenta.toMap()); // Agregar cuenta
+  } catch (e) {
+    print('Error al agregar cuenta: $e');
+    rethrow;
   }
+}
 
-  //OBTENER LAS CUENTAS DE UN USUARIO
-  Future<List<Cuenta>> obtenerCuentas(String userId) async {
-    try {
-      QuerySnapshot snapshot = await _firestore
-          .collection('accounts')
-          .doc(userId)
-          .collection('user_accounts')
-          .get();
+  // OBTENER LAS CUENTAS DE UN USUARIO
+Future<List<Cuenta>> obtenerCuentas(String userEmail) async {
+  try {
+    QuerySnapshot snapshot = await _firestore
+        .collection('accounts')
+        .where('userEmail', isEqualTo: userEmail) // Filtrar por email
+        .get();
 
-      return snapshot.docs
-          .map((doc) =>
-              Cuenta.fromMap(doc.id, doc.data() as Map<String, dynamic>))
-          .toList();
-    } catch (e) {
-      print('Error al obtener cuentas: $e');
-      rethrow;
-    }
+    return snapshot.docs
+        .map((doc) => Cuenta.fromMap(doc.data() as Map<String, dynamic>))
+        .toList();
+  } catch (e) {
+    print('Error al obtener cuentas: $e');
+    rethrow;
   }
+}
 }
