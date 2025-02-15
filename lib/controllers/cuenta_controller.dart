@@ -8,13 +8,16 @@ class CuentaController with ChangeNotifier {
 
   List<Cuenta> get cuentas => _cuentas;
 
-  Future<void> cargarCuentas(String userId) async {
-    _cuentas = await _firebaseService.obtenerCuentas(userId);
+  // Modificamos cargarCuentas para aceptar userEmail
+  Future<void> cargarCuentas(String userEmail) async {
+    _cuentas = await _firebaseService.obtenerCuentas(userEmail); // Cambié userId por userEmail
     notifyListeners();
   }
 
-  Future<void> agregarCuenta(String userId, Cuenta cuenta) async {
-    await _firebaseService.agregarCuenta(userId, cuenta);
-    await cargarCuentas(userId);
+  // Modificamos agregarCuenta para aceptar un objeto Cuenta
+  Future<void> agregarCuenta(Cuenta cuenta) async {
+    await _firebaseService.agregarCuenta(cuenta); // Cambié para pasar el objeto cuenta directamente
+    await cargarCuentas(cuenta.userEmail); // Usamos el email de la cuenta para recargar las cuentas
   }
 }
+
