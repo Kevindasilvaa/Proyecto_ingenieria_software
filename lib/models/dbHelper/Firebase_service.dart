@@ -126,4 +126,25 @@ Future<List<Cuenta>> obtenerCuentas(String userEmail) async {
     rethrow;
   }
 }
+
+  Future<void> modificarCuenta(Cuenta cuenta) async {
+    try {
+      // 1. Obtener referencia al documento de la cuenta
+      final cuentaRef = _firestore
+          .collection('users')
+          .doc(cuenta.userEmail) // Usar userEmail para identificar al usuario
+          .collection('cuentas')
+          .doc(cuenta.idCuenta); // ID de la cuenta a modificar
+
+      // 2. Actualizar el documento con los datos de la cuenta
+      await cuentaRef.update(cuenta.toMap());
+
+      print('Cuenta modificada en Firestore: ${cuenta.idCuenta}'); // Mensaje de éxito
+
+    } catch (e) {
+      print('Error al modificar cuenta en Firestore: $e');
+      rethrow; // Re-lanza el error para que se pueda manejar en el controlador
+    }
+  }
+
 }

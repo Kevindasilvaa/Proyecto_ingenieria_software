@@ -39,7 +39,7 @@ class RecentTransactionsView extends StatelessWidget {
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Categoría: ${transaccion.categoria}'),
+                      Text('Categoría: ${transaccion.categoria_id}'),
                       Text('Monto: ${transaccion.monto}'),
                       Text('Fecha: ${DateFormat.yMd().format(transaccion.fecha)}'),
                     ],

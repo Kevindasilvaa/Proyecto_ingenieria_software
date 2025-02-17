@@ -20,6 +20,16 @@ class CuentaController with ChangeNotifier {
     await cargarCuentas(cuenta.userEmail); // Usamos el email de la cuenta para recargar las cuentas
   }
 
+    Future<void> modificarCuenta(Cuenta cuenta) async {
+    try {
+      await _firebaseService.modificarCuenta(cuenta); // Llama a la función en FirebaseService
+      await cargarCuentas(cuenta.userEmail); // Recarga las cuentas para actualizar la lista
+    } catch (e) {
+      print('Error al modificar cuenta: $e');
+      rethrow; // Re-lanza el error para que se pueda manejar en la UI
+    }
+  }
+
   // Nuevo método para calcular el balance total
   double calcularBalanceTotal() {
     double balanceTotal = 0;
