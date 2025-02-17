@@ -403,11 +403,44 @@ class _AddTransactionsPageState extends State<AddTransactionsPage> {
                                     monto:double.parse(_montoController.text),
                                     cuenta_id: _cuentaSeleccionada!,
                                   );
+                                  
 
                                   try {
-                                    await _controller
-                                        .agregarTransaccion(nuevaTransaccion);
+                                  // 1. Obtener la cuenta seleccionada
+                                  final cuentaSeleccionada = _cuentas.firstWhere(
+                                      (cuenta) => cuenta.idCuenta == _cuentaSeleccionada);
 
+                                  // 2. Calcular el nuevo saldo
+                                  double nuevoSaldo = _ingreso
+                                      ? cuentaSeleccionada.saldo +
+                                          double.parse(_montoController.text)
+                                      : cuentaSeleccionada.saldo -
+                                          double.parse(_montoController.text);
+
+                                  // 3. Crear una copia de la cuenta con el nuevo saldo
+                                  final cuentaModificada = Cuenta(
+                                    idCuenta: cuentaSeleccionada.idCuenta,
+                                    nombre: cuentaSeleccionada.nombre,
+                                    saldo: nuevoSaldo,
+                                    userEmail: cuentaSeleccionada.userEmail,
+                                    fechaCreacion: cuentaSeleccionada.fechaCreacion,
+                                    tipo: cuentaSeleccionada.tipo,
+                                    tipoMoneda: cuentaSeleccionada.tipoMoneda,
+                                  );
+
+                                  print(cuentaModificada.saldo);
+
+                                  // 4. Modificar la cuenta en Firestore
+                                  await Provider.of<CuentaController>(context,
+                                          listen: false)
+                                      .modificarCuenta(cuentaModificada);
+
+
+                                  // 5. Agregar la transacción
+                                  await _controller
+                                      .agregarTransaccion(nuevaTransaccion);
+
+                                  
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                           content:
