@@ -19,5 +19,14 @@ class CuentaController with ChangeNotifier {
     await _firebaseService.agregarCuenta(cuenta); // Cambié para pasar el objeto cuenta directamente
     await cargarCuentas(cuenta.userEmail); // Usamos el email de la cuenta para recargar las cuentas
   }
+
+  // Nuevo método para calcular el balance total
+  double calcularBalanceTotal() {
+    double balanceTotal = 0;
+    for (var cuenta in _cuentas) {
+      balanceTotal += cuenta.saldo;
+    }
+    return balanceTotal;
+  }
 }
 
