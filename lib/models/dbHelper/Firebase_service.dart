@@ -128,23 +128,34 @@ Future<List<Cuenta>> obtenerCuentas(String userEmail) async {
 }
 
   Future<void> modificarCuenta(Cuenta cuenta) async {
-    try {
-      // 1. Obtener referencia al documento de la cuenta
-      final cuentaRef = _firestore
-          .collection('users')
-          .doc(cuenta.userEmail) // Usar userEmail para identificar al usuario
-          .collection('cuentas')
-          .doc(cuenta.idCuenta); // ID de la cuenta a modificar
+    
+  try {
+    // 1. Obtener la referencia a la colección de cuentas
+    final accountsRef = _firestore.collection('accounts');
 
-      // 2. Actualizar el documento con los datos de la cuenta
-      await cuentaRef.update(cuenta.toMap());
+    // 2. Buscar el documento que tenga el atributo `idCuenta` que coincide con `cuenta.idCuenta`
+    final querySnapshot = await accountsRef
+        .where('idCuenta', isEqualTo: cuenta.idCuenta) // Filtro por el atributo idCuenta
+        .get();
 
-      print('Cuenta modificada en Firestore: ${cuenta.idCuenta}'); // Mensaje de éxito
-
-    } catch (e) {
-      print('Error al modificar cuenta en Firestore: $e');
-      rethrow; // Re-lanza el error para que se pueda manejar en el controlador
+    if (querySnapshot.docs.isEmpty) {
+      // Si no se encuentra ningún documento con el idCuenta proporcionado
+      print('No se encontró ninguna cuenta con el idCuenta: ${cuenta.idCuenta}');
+      return; // Salir del método si no se encuentra el documento
     }
+
+    // 3. Obtener el primer documento de la consulta (suponiendo que solo debería haber uno)
+    final docRef = querySnapshot.docs.first.reference;
+
+    // 4. Actualizar el documento con los datos de la cuenta
+    await docRef.update(cuenta.toMap());
+
+    print('Cuenta modificada en Firestore: ${cuenta.idCuenta}'); // Mensaje de éxito
+
+  } catch (e) {
+    print('Error al modificar cuenta en Firestore: $e');
+    rethrow; // Re-lanza el error para que se pueda manejar en el controlador
   }
+}
 
 }

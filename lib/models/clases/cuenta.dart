@@ -1,3 +1,58 @@
+// import 'dart:math';
+
+// class Cuenta {
+//   final String nombre;
+//   final String tipo;
+//   final double saldo;
+//   final DateTime fechaCreacion;
+//   final String userEmail;
+//   final String tipoMoneda;
+//   late String idCuenta;
+
+//   Cuenta({
+//     required this.nombre,
+//     required this.tipo,
+//     required this.saldo,
+//     required this.fechaCreacion,
+//     required this.userEmail,
+//     required this.tipoMoneda, 
+//     idCuenta,
+//   }) {
+//     generarIdCuenta(); // Generar el ID al crear la cuenta
+//   }
+
+//   Map<String, dynamic> toMap() {
+//     return {
+//       'nombre': nombre,
+//       'tipo': tipo,
+//       'saldo': saldo,
+//       'fechaCreacion': fechaCreacion.toIso8601String(),
+//       'userEmail': userEmail,
+//       'tipoMoneda': tipoMoneda,
+//       'idCuenta': idCuenta,
+//     };
+//   }
+
+//   factory Cuenta.fromMap(Map<String, dynamic> data) {
+//     return Cuenta(
+//       nombre: data['nombre'],
+//       tipo: data['tipo'],
+//       saldo: (data['saldo'] as num).toDouble(),
+//       fechaCreacion: DateTime.parse(data['fechaCreacion']),
+//       userEmail: data['userEmail'],
+//       tipoMoneda: data['tipoMoneda'],
+//       idCuenta: data['idCuenta'],
+//     );
+//   }
+
+//   void generarIdCuenta() {
+//     const caracteres = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+//     Random random = Random();
+//     idCuenta = String.fromCharCodes(
+//       Iterable.generate(50, (_) => caracteres.codeUnitAt(random.nextInt(caracteres.length))),
+//     );
+//   }
+// }
 import 'dart:math';
 
 class Cuenta {
@@ -16,9 +71,9 @@ class Cuenta {
     required this.fechaCreacion,
     required this.userEmail,
     required this.tipoMoneda, 
-    idCuenta,
+    String? idCuenta,  // Se hace opcional
   }) {
-    generarIdCuenta(); // Generar el ID al crear la cuenta
+    this.idCuenta = idCuenta ?? generarIdCuenta(); // Si no se pasa, se genera
   }
 
   Map<String, dynamic> toMap() {
@@ -41,14 +96,14 @@ class Cuenta {
       fechaCreacion: DateTime.parse(data['fechaCreacion']),
       userEmail: data['userEmail'],
       tipoMoneda: data['tipoMoneda'],
-      idCuenta: data['idCuenta'],
+      idCuenta: data['idCuenta'], // Se pasa el idCuenta directamente
     );
   }
 
-  void generarIdCuenta() {
+  String generarIdCuenta() {
     const caracteres = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     Random random = Random();
-    idCuenta = String.fromCharCodes(
+    return String.fromCharCodes(
       Iterable.generate(50, (_) => caracteres.codeUnitAt(random.nextInt(caracteres.length))),
     );
   }
