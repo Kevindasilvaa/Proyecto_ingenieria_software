@@ -7,41 +7,39 @@ import 'package:moni/views/widgets/CustomDrawer.dart';
 
 class StatisticsPage extends StatelessWidget {
 
-  @override
+@override
   Widget build(BuildContext context) {
     final userController = Provider.of<UserController>(context);
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.grey[200],
-        title: Text('Estadísticas'),
+        backgroundColor: const Color(0xFFFFFFFF),
+        title: const Text('Estadísticas', style: TextStyle(color: Colors.black)),
+        iconTheme: const IconThemeData(color: Colors.black),
       ),
-      drawer: CustomDrawer(), // Aquí agregamos el Drawer
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
+      drawer: CustomDrawer(),
+      body: Column(
+        children: [
+          Expanded(
               child: Center(
                 child: userController.usuario != null
                     ? Text('¡Bienvenido, ${userController.usuario?.name}!')
                     : CircularProgressIndicator(),
               ),
             ),
-            Container(
-              height: 80.0,
-              child: NavBar(
-                onPlusPressed: () {
-                  Navigator.of(context).pushNamed('/addTransactions');
-                },
-                currentPage: '/statistics',
-              ),
+          Container(
+            height: 100.0,
+            child: NavBar(
+              onPlusPressed: () {
+                Navigator.of(context).pushNamed('/addTransactions');
+              },
+              currentPage: '/statistics',
             ),
-          ],
-        ),
+          ),
+        ],
       ),
-
     );
+    }
   }
-}
 
 

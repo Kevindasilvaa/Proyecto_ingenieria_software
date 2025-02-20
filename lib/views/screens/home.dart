@@ -84,7 +84,7 @@ class _HomePageState extends State<HomePage> {
                   ),
           ),
           Container(
-            height: 80.0,
+            height: 100.0,
             child: NavBar(
               onPlusPressed: () {
                 Navigator.of(context).pushNamed('/addTransactions');

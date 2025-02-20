@@ -62,8 +62,8 @@ class _TransactionsPageState extends State<TransactionsPage> {
         title: Text('Transacciones'),
       ),
       drawer: CustomDrawer(),
-      body: SafeArea(
-        child: Column(
+      body:
+        Column(
           children: [
             Container(
               width: double.infinity,
@@ -104,7 +104,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
                   : Center(child: CircularProgressIndicator()),
             ),
             Container(
-              height: 80.0,
+              height: 100.0,
               child: NavBar(
                 onPlusPressed: () {
                   Navigator.of(context).pushNamed('/addTransactions');
@@ -114,7 +114,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
             ),
           ],
         ),
-      ),
+      
     );
   }
 

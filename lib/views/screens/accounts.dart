@@ -24,8 +24,8 @@ class AccountsPage extends StatelessWidget {
         title: Text('Cuentas'),
       ),
       drawer: CustomDrawer(),
-      body: SafeArea(
-        child: Column(
+      body:
+         Column(
           children: [
             // Mensaje de bienvenida
             Padding(
@@ -105,7 +105,7 @@ class AccountsPage extends StatelessWidget {
 
             // Barra de navegación
             Container(
-              height: 80.0,
+              height: 100.0,
               child: NavBar(
                 onPlusPressed: () {
                   Navigator.of(context).pushNamed('/addTransactions');
@@ -115,7 +115,6 @@ class AccountsPage extends StatelessWidget {
             ),
           ],
         ),
-      ),
     );
   }
 }
