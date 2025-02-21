@@ -5,6 +5,7 @@ import 'package:moni/models/clases/Usuario.dart';
 import 'package:moni/views/widgets/CustomButton.dart';
 import 'package:provider/provider.dart';
 import 'package:moni/views/widgets/CustomTextField.dart';
+import 'package:moni/views/widgets/GoogleSignInButton.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -137,9 +138,11 @@ class _LoginPageState extends State<LoginPage> {
                 onPressed: signIn,
                 text: 'INICIAR SESIÓN',
               ),
-              CustomButton(
-                onPressed: signInWithGoogle,
-                text: 'INICIAR SESIÓN WITH GOOGLE',
+              SizedBox(height: 20), // 20 píxeles de espacio vertical
+              GoogleSignInButton(
+                onPressed: () {
+                  signInWithGoogle();
+                },
               ),
             ],
           ),

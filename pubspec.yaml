@@ -48,3 +48,5 @@ flutter_launcher_icons:
 
 flutter:
   uses-material-design: true
+  assets: # <--- AÑADE ESTA SECCIÓN
+    - assets/images/google_logo_2.png # <--- Y ESTA LÍNEA (con la ruta a tu imagen)

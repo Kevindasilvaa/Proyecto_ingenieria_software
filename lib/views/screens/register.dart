@@ -3,6 +3,7 @@ import 'package:moni/controllers/user_controller.dart'; // Importa el controlado
 import 'package:moni/models/clases/Usuario.dart'; // Importa la clase User
 import 'package:moni/views/widgets/CustomButton.dart';
 import 'package:moni/views/widgets/CustomTextField.dart';
+import 'package:moni/views/widgets/GoogleSignInButton.dart';
 import 'package:provider/provider.dart';
 
 class RegisterPage extends StatefulWidget { // Renombra la clase a RegisterPage
@@ -118,9 +119,11 @@ Future<void> createAccountWithGoogle() async {
                 onPressed: createAccount,
                 text: 'CREAR CUENTA',
               ),
-              CustomButton(
-                onPressed: createAccountWithGoogle,
-                text: 'CREAR CUENTA CON GOOGLE',
+              SizedBox(height: 20), // 20 píxeles de espacio vertical
+              GoogleSignInButton(
+                onPressed: () {
+                  createAccountWithGoogle();
+                },
               ),
             ],
           ),
