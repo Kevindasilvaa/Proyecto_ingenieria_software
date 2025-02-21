@@ -3,6 +3,7 @@ import 'package:moni/controllers/user_controller.dart'; // Importa el controlado
 import 'package:moni/models/clases/Usuario.dart'; // Importa la clase User
 import 'package:moni/views/widgets/CustomButton.dart';
 import 'package:moni/views/widgets/CustomTextField.dart';
+import 'package:provider/provider.dart';
 
 class RegisterPage extends StatefulWidget { // Renombra la clase a RegisterPage
   @override
@@ -35,6 +36,32 @@ class _RegisterPageState extends State<RegisterPage> { // Renombra el estado
     }
   }
 }
+
+Future<void> createAccountWithGoogle() async {
+    try {
+      final userController = Provider.of<UserController>(context, listen: false);
+      await userController.signInWithGoogle();
+
+      if (userController.usuario != null) {
+        // Navegar a la siguiente pantalla
+        Navigator.pushReplacementNamed(context, '/home');
+        ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Se inicio sesion exitosamente')),
+      );
+      } else {
+        // Mostrar mensaje de error
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Ocurrio un error.")),
+        );
+      }
+    } catch (e) {
+      print('Error en signInWithGoogle en LoginPage: $e');
+      // Mostrar un mensaje de error genérico en la UI
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al crear cuenta con Google')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,6 +117,10 @@ class _RegisterPageState extends State<RegisterPage> { // Renombra el estado
               CustomButton(
                 onPressed: createAccount,
                 text: 'CREAR CUENTA',
+              ),
+              CustomButton(
+                onPressed: createAccountWithGoogle,
+                text: 'CREAR CUENTA CON GOOGLE',
               ),
             ],
           ),
