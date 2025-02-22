@@ -15,7 +15,6 @@ class _AddAccountPageState extends State<AddAccountPage> {
   String _tipo = 'Ahorro';
   double _saldo = 0.0;
   String _tipoMoneda = 'USD'; // Puedes ajustar las opciones de moneda
-  String _idCuenta = ''; // Puede generar un ID único o usar un valor predeterminado
 
   @override
   Widget build(BuildContext context) {
@@ -99,7 +98,6 @@ class _AddAccountPageState extends State<AddAccountPage> {
                       fechaCreacion: DateTime.now(),
                       userEmail: userEmail, // Usar el correo del usuario
                       tipoMoneda: _tipoMoneda, // El tipo de moneda seleccionado
-                      idCuenta: _idCuenta, // Si es necesario, generar un ID único
                     );
 
                     // Agregar la cuenta utilizando el controlador
