@@ -51,19 +51,32 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  @override
+@override
   Widget build(BuildContext context) {
     final cuentaController = Provider.of<CuentaController>(context);
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFFFFFFFF),
-        title: const Text('Home', style: TextStyle(color: Colors.black)),
+        backgroundColor: const Color(0xFFF2F2F2),
+        elevation: 0,
+        title: const Text('Inicio',
+            style: TextStyle(color: Colors.black, fontSize: 20)), // Tamaño de letra ajustado
         iconTheme: const IconThemeData(color: Colors.black),
       ),
       drawer: CustomDrawer(),
       body: Column(
         children: [
+          Container(
+            height: MediaQuery.of(context).size.height * 0.30, // Altura ajustada
+            decoration: const BoxDecoration(
+              color: Color(0xFFF2F2F2),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(45),
+                bottomRight: Radius.circular(45),
+              ),
+            ),
+            child: _buildBalanceCard(cuentaController),
+          ),
           Expanded(
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
@@ -72,11 +85,10 @@ class _HomePageState extends State<HomePage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildBalanceCard(cuentaController),
                         const SizedBox(height: 20),
                         const Text('Transacciones recientes',
                             style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold)),
+                                fontSize: 20, fontWeight: FontWeight.bold)), // Tamaño de letra ajustado
                         const SizedBox(height: 10),
                         Expanded(child: RecentTransactionsView()),
                       ],
@@ -85,6 +97,13 @@ class _HomePageState extends State<HomePage> {
           ),
           Container(
             height: 100.0,
+            decoration: const BoxDecoration(
+              color: Color(0xFFF2F2F2),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(40),
+                topRight: Radius.circular(40),
+              ),
+            ),
             child: NavBar(
               onPlusPressed: () {
                 Navigator.of(context).pushNamed('/addTransactions');
@@ -97,46 +116,85 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildBalanceCard(CuentaController cuentaController) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF2F2F2),
-        borderRadius: BorderRadius.circular(10),
+Widget _buildBalanceCard(CuentaController cuentaController) {
+  return Column( 
+    mainAxisAlignment: MainAxisAlignment.center,
+    crossAxisAlignment: CrossAxisAlignment.center,
+    children: [
+      const Text('Balance Total', style: TextStyle(fontSize: 18)),
+      Text(
+        '\$${cuentaController.calcularBalanceTotal()}',
+        style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,  // Centrar contenido
-      crossAxisAlignment: CrossAxisAlignment.center,  // Centrar contenido horizontalmente
+      const SizedBox(height: 10),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          const Text('Balance Total', style: TextStyle(fontSize: 16)),
-          Text(
-            '\$${cuentaController.calcularBalanceTotal()}',
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Column(
             children: [
-              Column(
+              Row(
                 children: [
-                  const Text('Total Ingresos',
-                      style: TextStyle(color: Colors.green)),
-                  TotalIngresosView(),
+                  const SizedBox(width: 5),
+                  const Text('Total Ingresos', style: TextStyle(fontSize: 16)),
                 ],
               ),
-              Column(
+              Row(
                 children: [
-                  const Text('Total Gastos',
-                      style: TextStyle(color: Colors.red)),
-                  TotalGastosView(),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.green.withOpacity(0.5),
+                      shape: BoxShape.circle,
+                    ),
+                    padding: const EdgeInsets.all(4),
+                    child: const Icon(Icons.arrow_upward, color: Colors.green, size: 20),
+                  ),
+                  const SizedBox(width: 2),
+                  DefaultTextStyle(
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF006400),
+                    ),
+                    child: TotalIngresosView(),
+                  ),
+                ],
+              )
+            ],
+          ),
+          Column(
+            children: [
+              Row(
+                children: [
+                  const SizedBox(width: 5),
+                  const Text('Total Gastos', style: TextStyle(fontSize: 16)),
                 ],
               ),
+              Row(
+                children: [
+                  DefaultTextStyle(
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF8B0000),
+                    ),
+                    child: TotalGastosView(),
+                  ),
+                  const SizedBox(width: 2),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.5),
+                      shape: BoxShape.circle,
+                    ),
+                    padding: const EdgeInsets.all(4),
+                    child: const Icon(Icons.arrow_downward, color: Color(0xFFD32F2F), size: 20),
+                  ),
+                ],
+              )
             ],
           ),
         ],
       ),
-    );
-  }
+    ],
+  );
+}
 
   Future<void> _logout() async {
     final userController = Provider.of<UserController>(context, listen: false);

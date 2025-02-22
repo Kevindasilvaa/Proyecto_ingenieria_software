@@ -38,7 +38,8 @@ class RecentTransactionsView extends StatelessWidget {
                 child: ListTile(
                   leading: Icon(
                     Icons.monetization_on,
-                    color: transaccion.ingreso ? Colors.green : Colors.red
+                    color: transaccion.ingreso ? Colors.green : Colors.red,
+                    size: 40, // Tamaño del icono
                   ), // Icono de ingreso/gasto
                   title: Text(transaccion.nombre),
                   subtitle: Column(
