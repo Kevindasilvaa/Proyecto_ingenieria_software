@@ -52,149 +52,169 @@ class _HomePageState extends State<HomePage> {
   }
 
 @override
-  Widget build(BuildContext context) {
-    final cuentaController = Provider.of<CuentaController>(context);
+Widget build(BuildContext context) {
+  final cuentaController = Provider.of<CuentaController>(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color(0xFFF2F2F2),
-        elevation: 0,
-        title: const Text('Inicio',
-            style: TextStyle(color: Colors.black, fontSize: 20)), // Tamaño de letra ajustado
-        iconTheme: const IconThemeData(color: Colors.black),
+  return Scaffold(
+    appBar: AppBar(
+      backgroundColor: const Color(0xFFF2F2F2),
+      elevation: 0,
+      title: const Text(
+        'Inicio',
+        style: TextStyle(color: Colors.black, fontSize: 20), // Título ajustado
       ),
-      drawer: CustomDrawer(),
-      body: Column(
-        children: [
-          Container(
-            height: MediaQuery.of(context).size.height * 0.30, // Altura ajustada
-            decoration: const BoxDecoration(
-              color: Color(0xFFF2F2F2),
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(45),
-                bottomRight: Radius.circular(45),
-              ),
+      iconTheme: const IconThemeData(color: Colors.black),
+    ),
+    drawer: CustomDrawer(),
+    body: Column(
+      children: [
+        Container(
+          height: MediaQuery.of(context).size.height * 0.20, // Altura ajustada
+          decoration: const BoxDecoration(
+            color: Color(0xFFF2F2F2),
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(40),
+              bottomRight: Radius.circular(40),
             ),
-            child: _buildBalanceCard(cuentaController),
           ),
-          Expanded(
-            child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 20),
-                        const Text('Transacciones recientes',
-                            style: TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.bold)), // Tamaño de letra ajustado
-                        const SizedBox(height: 10),
-                        Expanded(child: RecentTransactionsView()),
-                      ],
-                    ),
+          child:
+      _buildBalanceCard(cuentaController),),
+        Expanded(
+          child: _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 20),
+                      const Text(
+                        'Transacciones recientes',
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 10),
+                      Expanded(child: RecentTransactionsView()),
+                    ],
                   ),
-          ),
-          Container(
-            height: 100.0,
-            decoration: const BoxDecoration(
-              color: Color(0xFFF2F2F2),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(40),
-                topRight: Radius.circular(40),
-              ),
-            ),
-            child: NavBar(
-              onPlusPressed: () {
-                Navigator.of(context).pushNamed('/addTransactions');
-              },
-              currentPage: '/home',
+                ),
+        ),
+        Container(
+          height: 100.0,
+          decoration: const BoxDecoration(
+            color: Color(0xFFF2F2F2),
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(40),
+              topRight: Radius.circular(40),
             ),
           ),
-        ],
-      ),
-    );
-  }
+          child: NavBar(
+            onPlusPressed: () {
+              Navigator.of(context).pushNamed('/addTransactions');
+            },
+            currentPage: '/home',
+          ),
+        ),
+      ],
+    ),
+  );
+}
 
 Widget _buildBalanceCard(CuentaController cuentaController) {
-  return Column( 
+  return Column(
     mainAxisAlignment: MainAxisAlignment.center,
     crossAxisAlignment: CrossAxisAlignment.center,
     children: [
-      const Text('Balance Total', style: TextStyle(fontSize: 18)),
+      // Título "Balance Total"
+      const Text(
+        'Balance Total',
+        style: TextStyle(fontSize: 18),
+      ),
+      
+      // Monto del balance total
       Text(
         '\$${cuentaController.calcularBalanceTotal()}',
         style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
       ),
+      
       const SizedBox(height: 10),
+      
+      // Fila con los detalles de ingresos y gastos
       Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        mainAxisAlignment: MainAxisAlignment.center, // Centrado de ambos bloques
         children: [
-          Column(
-            children: [
-              Row(
-                children: [
-                  const SizedBox(width: 5),
-                  const Text('Total Ingresos', style: TextStyle(fontSize: 16)),
-                ],
-              ),
-              Row(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.5),
-                      shape: BoxShape.circle,
+          // Sección de Total Ingresos
+          Padding(
+            padding: const EdgeInsets.only(right: 20.0), // Añadido un padding a la derecha
+            child: Column(
+              children: [
+                const Text('Total Ingresos', style: TextStyle(fontSize: 16)),
+                Row(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.green.withOpacity(0.5),
+                        shape: BoxShape.circle,
+                      ),
+                      padding: const EdgeInsets.all(4),
+                      child: const Icon(Icons.arrow_upward, color: Color.fromARGB(255, 42, 144, 45), size: 20),
                     ),
-                    padding: const EdgeInsets.all(4),
-                    child: const Icon(Icons.arrow_upward, color: Colors.green, size: 20),
-                  ),
-                  const SizedBox(width: 2),
-                  DefaultTextStyle(
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF006400),
+                    const SizedBox(width: 2),
+                    DefaultTextStyle(
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromARGB(255, 16, 191, 16),
+                      ),
+                      child: TotalIngresosView(),
                     ),
-                    child: TotalIngresosView(),
-                  ),
-                ],
-              )
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
-          Column(
-            children: [
-              Row(
-                children: [
-                  const SizedBox(width: 5),
-                  const Text('Total Gastos', style: TextStyle(fontSize: 16)),
-                ],
-              ),
-              Row(
-                children: [
-                  DefaultTextStyle(
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF8B0000),
+          
+          // Línea vertical separadora (simulada con un Container)
+          Container(
+            color: Colors.grey,  // Color de la línea
+            width: 1,  // Grosor de la línea
+            height: 50, // Altura de la línea (ajustar según sea necesario)
+            margin: const EdgeInsets.symmetric(horizontal: 10), // Espaciado alrededor de la línea
+          ),
+          
+          // Sección de Total Gastos
+          Padding(
+            padding: const EdgeInsets.only(left: 20.0), // Añadido un padding a la izquierda
+            child: Column(
+              children: [
+                const Text('Total Gastos', style: TextStyle(fontSize: 16)),
+                Row(
+                  children: [
+                    DefaultTextStyle(
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF8B0000),
+                      ),
+                      child: TotalGastosView(),
                     ),
-                    child: TotalGastosView(),
-                  ),
-                  const SizedBox(width: 2),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.5),
-                      shape: BoxShape.circle,
+                    const SizedBox(width: 2),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.5),
+                        shape: BoxShape.circle,
+                      ),
+                      padding: const EdgeInsets.all(4),
+                      child: const Icon(Icons.arrow_downward, color: Color.fromARGB(255, 203, 16, 2), size: 20),
                     ),
-                    padding: const EdgeInsets.all(4),
-                    child: const Icon(Icons.arrow_downward, color: Color(0xFFD32F2F), size: 20),
-                  ),
-                ],
-              )
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         ],
       ),
     ],
   );
 }
+
 
   Future<void> _logout() async {
     final userController = Provider.of<UserController>(context, listen: false);
@@ -236,7 +256,7 @@ class TotalIngresosView extends StatelessWidget {
           // Usamos el formato correcto para la moneda
           return Text(
             '+${NumberFormat.simpleCurrency().format(totalIngresos)}',
-            style: const TextStyle(color: Colors.green, fontSize: 16),
+            style: const TextStyle(color: Color.fromARGB(255, 65, 181, 71), fontSize: 20),
           );
         }
       },
@@ -274,7 +294,7 @@ class TotalGastosView extends StatelessWidget {
 
           return Text(
             '-${NumberFormat.simpleCurrency().format(totalGastos)}',
-            style: const TextStyle(color: Colors.red, fontSize: 16),
+            style: const TextStyle(color: Color.fromARGB(255, 224, 18, 3), fontSize: 20),
           );
         }
       },
