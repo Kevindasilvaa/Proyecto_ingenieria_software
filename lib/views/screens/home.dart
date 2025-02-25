@@ -69,7 +69,7 @@ Widget build(BuildContext context) {
     body: Column(
       children: [
         Container(
-          height: MediaQuery.of(context).size.height * 0.20, // Altura ajustada
+          height: MediaQuery.of(context).size.height * 0.25, // Altura ajustada
           decoration: const BoxDecoration(
             color: Color(0xFFF2F2F2),
             borderRadius: BorderRadius.only(
@@ -144,7 +144,7 @@ Widget _buildBalanceCard(CuentaController cuentaController) {
         children: [
           // Sección de Total Ingresos
           Padding(
-            padding: const EdgeInsets.only(right: 20.0), // Añadido un padding a la derecha
+            padding: const EdgeInsets.only(right: 5.0), // Añadido un padding a la derecha
             child: Column(
               children: [
                 const Text('Total Ingresos', style: TextStyle(fontSize: 16)),
@@ -182,7 +182,7 @@ Widget _buildBalanceCard(CuentaController cuentaController) {
           
           // Sección de Total Gastos
           Padding(
-            padding: const EdgeInsets.only(left: 20.0), // Añadido un padding a la izquierda
+            padding: const EdgeInsets.only(left: 5.0), // Añadido un padding a la izquierda
             child: Column(
               children: [
                 const Text('Total Gastos', style: TextStyle(fontSize: 16)),
