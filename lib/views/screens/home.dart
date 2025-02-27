@@ -144,7 +144,7 @@ Widget _buildBalanceCard(CuentaController cuentaController) {
         children: [
           // Sección de Total Ingresos
           Padding(
-            padding: const EdgeInsets.only(right: 5.0), // Añadido un padding a la derecha
+            padding: const EdgeInsets.only(right: 4.0), // Añadido un padding a la derecha
             child: Column(
               children: [
                 const Text('Total Ingresos', style: TextStyle(fontSize: 16)),
@@ -182,7 +182,7 @@ Widget _buildBalanceCard(CuentaController cuentaController) {
           
           // Sección de Total Gastos
           Padding(
-            padding: const EdgeInsets.only(left: 5.0), // Añadido un padding a la izquierda
+            padding: const EdgeInsets.only(left: 4.0), // Añadido un padding a la izquierda
             child: Column(
               children: [
                 const Text('Total Gastos', style: TextStyle(fontSize: 16)),
