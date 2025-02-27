@@ -129,6 +129,22 @@ class FirebaseService {
     }
   }
 
+  // OBTENER LAS CUENTAS DE UN USUARIO (ESCUCHANDO CAMBIOS)
+  Stream<List<Cuenta>> obtenerCuentasStream(String userEmail) {
+    try {
+      return _firestore
+          .collection('accounts')
+          .where('userEmail', isEqualTo: userEmail)
+          .snapshots() // Usamos snapshots() para escuchar cambios
+          .map((snapshot) => snapshot.docs
+              .map((doc) => Cuenta.fromMap(doc.data() as Map<String, dynamic>))
+              .toList());
+    } catch (e) {
+      print('Error al obtener cuentas: $e');
+      return Stream.error(e); // Retornamos un Stream de error
+    }
+  }
+
   Future<void> modificarCuenta(Cuenta cuenta) async {
     try {
       // 1. Obtener la referencia a la colección de cuentas

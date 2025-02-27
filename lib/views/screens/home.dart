@@ -120,6 +120,7 @@ Widget build(BuildContext context) {
 }
 
 Widget _buildBalanceCard(CuentaController cuentaController) {
+  final userController = Provider.of<UserController>(context);
   return Column(
     mainAxisAlignment: MainAxisAlignment.center,
     crossAxisAlignment: CrossAxisAlignment.center,
@@ -129,11 +130,24 @@ Widget _buildBalanceCard(CuentaController cuentaController) {
         'Balance Total',
         style: TextStyle(fontSize: 18),
       ),
-      
+
       // Monto del balance total
-      Text(
-        '\$${cuentaController.calcularBalanceTotal()}',
-        style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+      StreamBuilder<double>(
+        stream: cuentaController.calcularBalanceTotalStream(userController.usuario!.email),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData) {
+            return const Center(child: Text('No hay datos de balance'));
+          } else {
+            return Text(
+              '${NumberFormat.simpleCurrency().format(snapshot.data)}',
+              style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+            );
+          }
+        },
       ),
       
       const SizedBox(height: 10),

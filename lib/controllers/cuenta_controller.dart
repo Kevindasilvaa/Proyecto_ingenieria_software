@@ -44,6 +44,20 @@ class CuentaController with ChangeNotifier {
     return balanceTotal;
   }
 
+  // Método modificado para calcular el balance a partir de una lista de cuentas
+  double calcularBalanceTotal2(List<Cuenta> cuentas) {
+    double balanceTotal = 0;
+    for (var cuenta in cuentas) {
+      balanceTotal += cuenta.saldo;
+    }
+    return balanceTotal;
+  }
+  // Stream para escuchar los cambios en las cuentas y calcular el balance
+  Stream<double> calcularBalanceTotalStream(String userEmail) {
+    return _firebaseService.obtenerCuentasStream(userEmail).map((cuentas) {
+      return calcularBalanceTotal2(cuentas);
+    });
+  }
   // Método para eliminar una cuenta
   Future<void> eliminarCuenta(String idCuenta, String userEmail) async {
     try {
