@@ -25,7 +25,9 @@ class NavBar extends StatelessWidget {
             IconButton(
               icon: Icon(
                 Icons.home,
-                color: currentPage == '/home' ? Colors.grey[900] : Colors.white, // Cambio de color
+                color: currentPage == '/home'
+                    ? Colors.grey[900]
+                    : Colors.white, // Cambio de color
               ),
               onPressed: () {
                 Navigator.pushNamed(context, '/home');
@@ -35,7 +37,9 @@ class NavBar extends StatelessWidget {
             IconButton(
               icon: Icon(
                 Icons.bar_chart,
-                color: currentPage == '/statistics' ? Colors.grey[900] : Colors.white, // Cambio de color
+                color: currentPage == '/statistics'
+                    ? Colors.grey[900]
+                    : Colors.white, // Cambio de color
               ),
               onPressed: () {
                 Navigator.pushNamed(context, '/statistics');
@@ -46,7 +50,9 @@ class NavBar extends StatelessWidget {
             IconButton(
               icon: Icon(
                 Icons.compare_arrows,
-                color: currentPage == '/transactions' ? Colors.grey[900] : Colors.white, // Cambio de color
+                color: currentPage == '/transactions'
+                    ? Colors.grey[900]
+                    : Colors.white, // Cambio de color
               ),
               onPressed: () {
                 Navigator.pushNamed(context, '/transactions');
@@ -56,7 +62,9 @@ class NavBar extends StatelessWidget {
             IconButton(
               icon: Icon(
                 Icons.account_balance,
-                color: currentPage == '/accounts' ? Colors.grey[900] : Colors.white, // Cambio de color
+                color: currentPage == '/accounts'
+                    ? Colors.grey[900]
+                    : Colors.white, // Cambio de color
               ),
               onPressed: () {
                 Navigator.pushNamed(context, '/accounts');
@@ -65,7 +73,8 @@ class NavBar extends StatelessWidget {
           ],
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked, // Ubicación centrada
+      floatingActionButtonLocation:
+          FloatingActionButtonLocation.centerDocked, // Ubicación centrada
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.grey[600], // Color de fondo del botón
         shape: CircleBorder(), // Asegura que el botón sea circular
