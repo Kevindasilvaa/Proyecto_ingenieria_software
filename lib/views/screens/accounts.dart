@@ -77,29 +77,30 @@ class _AccountsPageState extends State<AccountsPage> {
                 ? _buildAccountList(_accounts)
                 : Center(child: Text('Inicia sesión para ver tus cuentas')),
           ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: AddAccountButton(
-              onAdd: () {
-                if (userEmail?.isNotEmpty ?? false) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => AddAccountPage()),
-                  );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text('Inicia sesión para agregar cuentas'),
-                    duration: Duration(seconds: 2),
-                  ));
-                }
-              },
-            ),
-          ),
+          // Boton eliminado
+          // Padding(
+          //   padding: const EdgeInsets.all(16.0),
+          //   child: AddAccountButton(
+          //     onAdd: () {
+          //       if (userEmail?.isNotEmpty ?? false) {
+          //         Navigator.push(
+          //           context,
+          //           MaterialPageRoute(builder: (context) => AddAccountPage()),
+          //         );
+          //       } else {
+          //         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          //           content: Text('Inicia sesión para agregar cuentas'),
+          //           duration: Duration(seconds: 2),
+          //         ));
+          //       }
+          //     },
+          //   ),
+          // ),
           Container(
             height: 100.0,
             child: NavBar(
               onPlusPressed: () {
-                Navigator.of(context).pushNamed('/addTransactions');
+                Navigator.of(context).pushNamed('/addAccounts');
               },
               currentPage: '/accounts',
             ),
