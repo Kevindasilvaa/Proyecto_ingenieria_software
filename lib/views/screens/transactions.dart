@@ -188,7 +188,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
                                   child: Text("Eliminar"),
                                   onPressed: () {
                                     _transaccionesController
-                                        .eliminarTransaccion(transaccion.id)
+                                        .eliminarTransaccion(transaccion)
                                         .then((_) {
                                       Navigator.of(context).pop();
                                       _cargarTransacciones(_selectedDay);
@@ -233,7 +233,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
                     Text(
                       '${transaccion.monto}',
                       style: TextStyle(
-                        color: transaccion.ingreso ? Colors.red : Colors.green,
+                        color: transaccion.ingreso ? Colors.green : Colors.red,
                       ),
                     ),
                     SizedBox(width: 7)

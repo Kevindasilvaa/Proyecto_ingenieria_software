@@ -129,7 +129,7 @@ class _EditTransactionPageState extends State<EditTransaction> {
                   );
 
                   try {
-                    await _controller.modificarTransaccion(updatedTransaction);
+                    await _controller.modificarTransaccion(updatedTransaction, widget.transaction);
                     Navigator.pop(context, true);
                     ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('Transacción Actualizada')));

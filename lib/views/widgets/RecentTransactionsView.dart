@@ -134,15 +134,17 @@
 // }
 import 'package:flutter/material.dart';
 import 'package:moni/controllers/category_controller.dart';
+import 'package:moni/controllers/cuenta_controller.dart';
 import 'package:moni/controllers/transaccion_controller.dart';
 import 'package:moni/models/clases/category.dart';
 import 'package:moni/models/clases/transaccion.dart';
 import 'package:intl/intl.dart';
+import 'package:moni/views/widgets/EditTransaction.dart';
 
 class RecentTransactionsView extends StatelessWidget {
   final TransaccionesController _controller = TransaccionesController();
   final CategoryController categoryController = CategoryController();
-
+  final CuentaController cuentaController = CuentaController();
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<Transaccion>>(
@@ -192,16 +194,58 @@ class RecentTransactionsView extends StatelessWidget {
                             icon: const Icon(Icons.edit),
                             color: Colors.orange, // Color para el ícono de editar
                             onPressed: () {
-                              // Acción para modificar
+                              Navigator.push(context,MaterialPageRoute(builder: (context) => EditTransaction(transaction: transaccion),),);
                             },
                           ),
                           IconButton(
-                            icon: const Icon(Icons.delete),
-                            color: Colors.red, // Color para el ícono de eliminar
+                            icon: Icon(Icons.delete, color: Colors.red),
                             onPressed: () {
-                              // Acción para eliminar
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: Text("Confirmar eliminación"),
+                                    content:
+                                        Text("¿Seguro que desea eliminar esta transacción?"),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        child: Text("Cancelar"),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                      TextButton(
+                                        child: Text("Eliminar"),
+                                        onPressed: () {
+                                          _controller
+                                              .eliminarTransaccion(transaccion)
+                                              .then((_) {
+                                            Navigator.of(context).pop();
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                SnackBar(
+                                                    content: Text(
+                                                        'Transacción eliminada')));
+                                          }).catchError((error) {
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                SnackBar(
+                                                    content: Text(
+                                                        'Error al eliminar')));
+                                          });
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
                             },
                           ),
+                          // IconButton(
+                          //   icon: const Icon(Icons.delete),
+                          //   color: Colors.red, // Color para el ícono de eliminar
+                          //   onPressed: () {
+                          //     // Acción para eliminar
+                          //   },
+                          // ),
                         ],
                       ),
                     ],
