@@ -101,61 +101,87 @@ class FirebaseService {
   }
 
 // AGREGAR UNA CUENTA A FIRESTORE
-Future<void> agregarCuenta(Cuenta cuenta) async {
-  try {
-    await _firestore.collection('accounts').add(cuenta.toMap()); // Agregar cuenta
-  } catch (e) {
-    print('Error al agregar cuenta: $e');
-    rethrow;
+  Future<void> agregarCuenta(Cuenta cuenta) async {
+    try {
+      await _firestore
+          .collection('accounts')
+          .add(cuenta.toMap()); // Agregar cuenta
+    } catch (e) {
+      print('Error al agregar cuenta: $e');
+      rethrow;
+    }
   }
-}
 
   // OBTENER LAS CUENTAS DE UN USUARIO
-Future<List<Cuenta>> obtenerCuentas(String userEmail) async {
-  try {
-    QuerySnapshot snapshot = await _firestore
-        .collection('accounts')
-        .where('userEmail', isEqualTo: userEmail) // Filtrar por email
-        .get();
+  Future<List<Cuenta>> obtenerCuentas(String userEmail) async {
+    try {
+      QuerySnapshot snapshot = await _firestore
+          .collection('accounts')
+          .where('userEmail', isEqualTo: userEmail) // Filtrar por email
+          .get();
 
-    return snapshot.docs
-        .map((doc) => Cuenta.fromMap(doc.data() as Map<String, dynamic>))
-        .toList();
-  } catch (e) {
-    print('Error al obtener cuentas: $e');
-    rethrow;
+      return snapshot.docs
+          .map((doc) => Cuenta.fromMap(doc.data() as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      print('Error al obtener cuentas: $e');
+      rethrow;
+    }
   }
-}
 
   Future<void> modificarCuenta(Cuenta cuenta) async {
-    
-  try {
-    // 1. Obtener la referencia a la colección de cuentas
-    final accountsRef = _firestore.collection('accounts');
+    try {
+      // 1. Obtener la referencia a la colección de cuentas
+      final accountsRef = _firestore.collection('accounts');
 
-    // 2. Buscar el documento que tenga el atributo `idCuenta` que coincide con `cuenta.idCuenta`
-    final querySnapshot = await accountsRef
-        .where('idCuenta', isEqualTo: cuenta.idCuenta) // Filtro por el atributo idCuenta
-        .get();
+      // 2. Buscar el documento que tenga el atributo `idCuenta` que coincide con `cuenta.idCuenta`
+      final querySnapshot = await accountsRef
+          .where('idCuenta',
+              isEqualTo: cuenta.idCuenta) // Filtro por el atributo idCuenta
+          .get();
 
-    if (querySnapshot.docs.isEmpty) {
-      // Si no se encuentra ningún documento con el idCuenta proporcionado
-      print('No se encontró ninguna cuenta con el idCuenta: ${cuenta.idCuenta}');
-      return; // Salir del método si no se encuentra el documento
+      if (querySnapshot.docs.isEmpty) {
+        // Si no se encuentra ningún documento con el idCuenta proporcionado
+        print(
+            'No se encontró ninguna cuenta con el idCuenta: ${cuenta.idCuenta}');
+        return; // Salir del método si no se encuentra el documento
+      }
+
+      // 3. Obtener el primer documento de la consulta (suponiendo que solo debería haber uno)
+      final docRef = querySnapshot.docs.first.reference;
+
+      // 4. Actualizar el documento con los datos de la cuenta
+      await docRef.update(cuenta.toMap());
+
+      print(
+          'Cuenta modificada en Firestore: ${cuenta.idCuenta}'); // Mensaje de éxito
+    } catch (e) {
+      print('Error al modificar cuenta en Firestore: $e');
+      rethrow; // Re-lanza el error para que se pueda manejar en el controlador
     }
-
-    // 3. Obtener el primer documento de la consulta (suponiendo que solo debería haber uno)
-    final docRef = querySnapshot.docs.first.reference;
-
-    // 4. Actualizar el documento con los datos de la cuenta
-    await docRef.update(cuenta.toMap());
-
-    print('Cuenta modificada en Firestore: ${cuenta.idCuenta}'); // Mensaje de éxito
-
-  } catch (e) {
-    print('Error al modificar cuenta en Firestore: $e');
-    rethrow; // Re-lanza el error para que se pueda manejar en el controlador
   }
-}
 
+  // ELIMINAR UNA CUENTA DE FIRESTORE
+  Future<void> eliminarCuenta(String idCuenta) async {
+    try {
+      // 1. Buscar el documento que tenga el atributo `idCuenta`
+      QuerySnapshot querySnapshot = await _firestore
+          .collection('accounts')
+          .where('idCuenta', isEqualTo: idCuenta)
+          .get();
+
+      if (querySnapshot.docs.isEmpty) {
+        print('No se encontró ninguna cuenta con idCuenta: $idCuenta');
+        return;
+      }
+
+      // 2. Obtener la referencia del primer documento encontrado y eliminarlo
+      await querySnapshot.docs.first.reference.delete();
+
+      print('Cuenta eliminada exitosamente');
+    } catch (e) {
+      print('Error al eliminar cuenta: $e');
+      throw e;
+    }
+  }
 }

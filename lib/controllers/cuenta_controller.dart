@@ -10,20 +10,25 @@ class CuentaController with ChangeNotifier {
 
   // Modificamos cargarCuentas para aceptar userEmail
   Future<void> cargarCuentas(String userEmail) async {
-    _cuentas = await _firebaseService.obtenerCuentas(userEmail); // Cambié userId por userEmail
+    _cuentas = await _firebaseService
+        .obtenerCuentas(userEmail); // Cambié userId por userEmail
     notifyListeners();
   }
 
   // Modificamos agregarCuenta para aceptar un objeto Cuenta
   Future<void> agregarCuenta(Cuenta cuenta) async {
-    await _firebaseService.agregarCuenta(cuenta); // Cambié para pasar el objeto cuenta directamente
-    await cargarCuentas(cuenta.userEmail); // Usamos el email de la cuenta para recargar las cuentas
+    await _firebaseService.agregarCuenta(
+        cuenta); // Cambié para pasar el objeto cuenta directamente
+    await cargarCuentas(cuenta
+        .userEmail); // Usamos el email de la cuenta para recargar las cuentas
   }
 
-    Future<void> modificarCuenta(Cuenta cuenta) async {
+  Future<void> modificarCuenta(Cuenta cuenta) async {
     try {
-      await _firebaseService.modificarCuenta(cuenta); // Llama a la función en FirebaseService
-      await cargarCuentas(cuenta.userEmail); // Recarga las cuentas para actualizar la lista
+      await _firebaseService
+          .modificarCuenta(cuenta); // Llama a la función en FirebaseService
+      await cargarCuentas(
+          cuenta.userEmail); // Recarga las cuentas para actualizar la lista
     } catch (e) {
       print('Error al modificar cuenta: $e');
       rethrow; // Re-lanza el error para que se pueda manejar en la UI
@@ -38,5 +43,16 @@ class CuentaController with ChangeNotifier {
     }
     return balanceTotal;
   }
-}
 
+  // Método para eliminar una cuenta
+  Future<void> eliminarCuenta(String idCuenta, String userEmail) async {
+    try {
+      await _firebaseService.eliminarCuenta(idCuenta);
+      print("Cuenta eliminada con éxito.");
+      await cargarCuentas(userEmail); // Recarga la lista de cuentas
+    } catch (e) {
+      print("Error al eliminar cuenta: $e");
+      throw e;
+    }
+  }
+}

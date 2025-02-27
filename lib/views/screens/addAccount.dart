@@ -14,7 +14,15 @@ class _AddAccountPageState extends State<AddAccountPage> {
   String _nombre = '';
   String _tipo = 'Ahorro';
   double _saldo = 0.0;
-  String _tipoMoneda = 'USD'; // Puedes ajustar las opciones de moneda
+  String _tipoMoneda = 'USD';
+
+  InputDecoration _inputDecoration(String label) {
+    return InputDecoration(
+      labelText: label,
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,31 +31,32 @@ class _AddAccountPageState extends State<AddAccountPage> {
 
     if (userEmail == null) {
       return Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
+        body: Center(child: CircularProgressIndicator()),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text('Agregar Cuenta')),
-      body: Padding(
+      appBar: AppBar(
+        title: Text('Agregar Cuenta'),
+        backgroundColor: Colors.grey[200],
+        foregroundColor: Colors.black,
+      ),
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Nombre de la cuenta
               TextFormField(
-                decoration: InputDecoration(labelText: 'Nombre de la cuenta'),
+                decoration: _inputDecoration('Nombre de la cuenta'),
                 onChanged: (value) => _nombre = value,
                 validator: (value) =>
                     value!.isEmpty ? 'Ingrese un nombre' : null,
               ),
-
-              // Tipo de cuenta
+              SizedBox(height: 20),
               DropdownButtonFormField<String>(
-                decoration: InputDecoration(labelText: 'Tipo de cuenta'),
+                decoration: _inputDecoration('Tipo de cuenta'),
                 value: _tipo,
                 onChanged: (value) => setState(() => _tipo = value!),
                 items: ['Ahorro', 'Corriente', 'Inversión']
@@ -55,21 +64,19 @@ class _AddAccountPageState extends State<AddAccountPage> {
                         DropdownMenuItem(value: tipo, child: Text(tipo)))
                     .toList(),
               ),
-
-              // Tipo de moneda
+              SizedBox(height: 20),
               DropdownButtonFormField<String>(
-                decoration: InputDecoration(labelText: 'Tipo de moneda'),
+                decoration: _inputDecoration('Tipo de moneda'),
                 value: _tipoMoneda,
                 onChanged: (value) => setState(() => _tipoMoneda = value!),
-                items: ['USD', 'EUR', 'MXN'] // Opciones de moneda
+                items: ['BS', 'USD', 'EUR', 'MXN']
                     .map((moneda) =>
                         DropdownMenuItem(value: moneda, child: Text(moneda)))
                     .toList(),
               ),
-
-              // Saldo inicial
+              SizedBox(height: 20),
               TextFormField(
-                decoration: InputDecoration(labelText: 'Saldo inicial'),
+                decoration: _inputDecoration('Saldo inicial'),
                 keyboardType: TextInputType.numberWithOptions(decimal: true),
                 onChanged: (value) {
                   setState(() {
@@ -83,31 +90,38 @@ class _AddAccountPageState extends State<AddAccountPage> {
                   return null;
                 },
               ),
+              SizedBox(height: 30),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    backgroundColor: const Color.fromARGB(255, 131, 132, 135),
+                  ),
+                  onPressed: () async {
+                    if (_formKey.currentState!.validate()) {
+                      Cuenta nuevaCuenta = Cuenta(
+                        nombre: _nombre,
+                        tipo: _tipo,
+                        saldo: _saldo,
+                        fechaCreacion: DateTime.now(),
+                        userEmail: userEmail,
+                        tipoMoneda: _tipoMoneda,
+                      );
 
-              SizedBox(height: 20),
+                      await Provider.of<CuentaController>(context,
+                              listen: false)
+                          .agregarCuenta(nuevaCuenta);
 
-              // Botón para guardar cuenta
-              ElevatedButton(
-                onPressed: () async {
-                  if (_formKey.currentState!.validate()) {
-                    // Crear la nueva cuenta con los nuevos atributos
-                    Cuenta nuevaCuenta = Cuenta(
-                      nombre: _nombre,
-                      tipo: _tipo,
-                      saldo: _saldo,
-                      fechaCreacion: DateTime.now(),
-                      userEmail: userEmail, // Usar el correo del usuario
-                      tipoMoneda: _tipoMoneda, // El tipo de moneda seleccionado
-                    );
-
-                    // Agregar la cuenta utilizando el controlador
-                    await Provider.of<CuentaController>(context, listen: false)
-                        .agregarCuenta(nuevaCuenta);
-
-                    Navigator.pop(context);
-                  }
-                },
-                child: Text('Guardar Cuenta'),
+                      Navigator.pop(context);
+                    }
+                  },
+                  child: Text('GUARDAR',
+                      style: TextStyle(fontSize: 18, color: Colors.white)),
+                ),
               ),
             ],
           ),
