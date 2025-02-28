@@ -8,7 +8,7 @@ class CustomDrawer extends StatefulWidget {
 }
 
 class _CustomDrawerState extends State<CustomDrawer> {
-  // Variable para almacenar el color del icono cuando el cursor está sobre él
+  // Variables para los colores de los íconos cuando el cursor está sobre ellos
   Color homeIconColor = Colors.grey[600]!;
   Color profileIconColor = Colors.grey[600]!;
   Color settingsIconColor = Colors.grey[600]!;
@@ -16,6 +16,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
   Color statisticsIconColor = Colors.grey[600]!;
   Color accountsIconColor = Colors.grey[600]!;
   Color categoriesIconColor = Colors.grey[600]!;
+  Color articlesIconColor = Colors.grey[600]!; // Nuevo color para Artículos
   Color offers_incomeIconColor = Colors.grey[600]!;
   Color transactionsIconColor = Colors.grey[600]!;
 
@@ -35,98 +36,103 @@ class _CustomDrawerState extends State<CustomDrawer> {
               child: Text(
                 'Menú',
                 style: TextStyle(
-                  color: Colors.black, // Color del texto del header
+                  color: Colors.black,
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
-              ),           
+              ),
             ),
-            // Opciones del menú con iconos visibles y resaltado al pasar el cursor
+            // Opción Inicio
             MouseRegion(
               onEnter: (_) {
                 setState(() {
-                  homeIconColor = Colors.grey[900]!; // Gris más oscuro al pasar el cursor
+                  homeIconColor = Colors.grey[900]!;
                 });
               },
               onExit: (_) {
                 setState(() {
-                  homeIconColor = Colors.grey[600]!; // Restaura el color original
+                  homeIconColor = Colors.grey[600]!;
                 });
               },
               child: ListTile(
-                leading: Icon(Icons.home, color: homeIconColor), // Solo cambia el color del icono de Home
+                leading: Icon(Icons.home, color: homeIconColor),
                 title: Text('Inicio'),
                 onTap: () {
                   Navigator.pushNamed(context, '/home');
                 },
               ),
             ),
+            // Opción Transacciones
             MouseRegion(
               onEnter: (_) {
                 setState(() {
-                  transactionsIconColor = Colors.grey[900]!; // Gris más oscuro al pasar el cursor
+                  transactionsIconColor = Colors.grey[900]!;
                 });
               },
               onExit: (_) {
                 setState(() {
-                  transactionsIconColor = Colors.grey[600]!; // Restaura el color original
+                  transactionsIconColor = Colors.grey[600]!;
                 });
               },
               child: ListTile(
-                leading: Icon(Icons.compare_arrows, color: transactionsIconColor), // Solo cambia el color del icono de Home
+                leading:
+                    Icon(Icons.compare_arrows, color: transactionsIconColor),
                 title: Text('Transacciones'),
                 onTap: () {
                   Navigator.pushNamed(context, '/transactions');
                 },
               ),
             ),
+            // Opción Estadísticas
             MouseRegion(
               onEnter: (_) {
                 setState(() {
-                  statisticsIconColor = Colors.grey[900]!; // Gris más oscuro al pasar el cursor
+                  statisticsIconColor = Colors.grey[900]!;
                 });
               },
               onExit: (_) {
                 setState(() {
-                  statisticsIconColor = Colors.grey[600]!; // Restaura el color original
+                  statisticsIconColor = Colors.grey[600]!;
                 });
               },
               child: ListTile(
-                leading: Icon(Icons.bar_chart, color: statisticsIconColor), // Solo cambia el color del icono de Home
+                leading: Icon(Icons.bar_chart, color: statisticsIconColor),
                 title: Text('Estadísticas'),
                 onTap: () {
                   Navigator.pushNamed(context, '/statistics');
                 },
               ),
             ),
+            // Opción Cuentas
             MouseRegion(
               onEnter: (_) {
                 setState(() {
-                  accountsIconColor = Colors.grey[900]!; // Gris más oscuro al pasar el cursor
+                  accountsIconColor = Colors.grey[900]!;
                 });
               },
               onExit: (_) {
                 setState(() {
-                  accountsIconColor = Colors.grey[600]!; // Restaura el color original
+                  accountsIconColor = Colors.grey[600]!;
                 });
               },
               child: ListTile(
-                leading: Icon(Icons.account_balance, color: accountsIconColor), // Solo cambia el color del icono de Home
+                leading: Icon(Icons.account_balance, color: accountsIconColor),
                 title: Text('Cuentas'),
                 onTap: () {
                   Navigator.pushNamed(context, '/accounts');
                 },
               ),
             ),
+            // Opción Perfil
             MouseRegion(
               onEnter: (_) {
                 setState(() {
-                  profileIconColor = Colors.grey[900]!; // Gris más oscuro al pasar el cursor
+                  profileIconColor = Colors.grey[900]!;
                 });
               },
               onExit: (_) {
                 setState(() {
-                  profileIconColor = Colors.grey[600]!; // Restaura el color original
+                  profileIconColor = Colors.grey[600]!;
                 });
               },
               child: ListTile(
@@ -137,15 +143,16 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 },
               ),
             ),
+            // Opción Categorías
             MouseRegion(
               onEnter: (_) {
                 setState(() {
-                  categoriesIconColor = Colors.grey[900]!; // Gris más oscuro al pasar el cursor
+                  categoriesIconColor = Colors.grey[900]!;
                 });
               },
               onExit: (_) {
                 setState(() {
-                  categoriesIconColor = Colors.grey[600]!; // Restaura el color original
+                  categoriesIconColor = Colors.grey[600]!;
                 });
               },
               child: ListTile(
@@ -156,34 +163,57 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 },
               ),
             ),
+            // NUEVA OPCIÓN: Artículos de Interés
             MouseRegion(
               onEnter: (_) {
                 setState(() {
-                  offers_incomeIconColor = Colors.grey[900]!; // Gris más oscuro al pasar el cursor
+                  articlesIconColor = Colors.grey[900]!;
                 });
               },
               onExit: (_) {
                 setState(() {
-                  offers_incomeIconColor = Colors.grey[600]!; // Restaura el color original
+                  articlesIconColor = Colors.grey[600]!;
                 });
               },
               child: ListTile(
-                leading: Icon(Icons.attach_money, color: offers_incomeIconColor),
+                leading: Icon(Icons.article, color: articlesIconColor),
+                title: Text('Artículos de Interés'),
+                onTap: () {
+                  Navigator.pushNamed(context, '/articles');
+                },
+              ),
+            ),
+            // Opción Ofertas de Ingresos
+            MouseRegion(
+              onEnter: (_) {
+                setState(() {
+                  offers_incomeIconColor = Colors.grey[900]!;
+                });
+              },
+              onExit: (_) {
+                setState(() {
+                  offers_incomeIconColor = Colors.grey[600]!;
+                });
+              },
+              child: ListTile(
+                leading:
+                    Icon(Icons.attach_money, color: offers_incomeIconColor),
                 title: Text('Ofertas de Ingresos'),
                 onTap: () {
                   Navigator.pushNamed(context, '/income_offers');
                 },
               ),
             ),
+            // Opción Configuración
             MouseRegion(
               onEnter: (_) {
                 setState(() {
-                  settingsIconColor = Colors.grey[900]!; // Gris más oscuro al pasar el cursor
+                  settingsIconColor = Colors.grey[900]!;
                 });
               },
               onExit: (_) {
                 setState(() {
-                  settingsIconColor = Colors.grey[600]!; // Restaura el color original
+                  settingsIconColor = Colors.grey[600]!;
                 });
               },
               child: ListTile(
@@ -194,15 +224,16 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 },
               ),
             ),
+            // Opción Cerrar sesión
             MouseRegion(
               onEnter: (_) {
                 setState(() {
-                  logoutIconColor = Colors.grey[900]!; // Gris más oscuro al pasar el cursor
+                  logoutIconColor = Colors.grey[900]!;
                 });
               },
               onExit: (_) {
                 setState(() {
-                  logoutIconColor = Colors.grey[600]!; // Restaura el color original
+                  logoutIconColor = Colors.grey[600]!;
                 });
               },
               child: ListTile(
@@ -218,10 +249,13 @@ class _CustomDrawerState extends State<CustomDrawer> {
       ),
     );
   }
+
   Future<void> _logout() async {
     final userController = Provider.of<UserController>(context, listen: false);
     await userController.logOut();
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Cierre de sesión exitoso.')));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Cierre de sesión exitoso.')),
+    );
     Navigator.pushNamed(context, '/');
   }
 }
