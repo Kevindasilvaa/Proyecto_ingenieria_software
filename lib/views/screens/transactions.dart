@@ -120,7 +120,9 @@ class _TransactionsPageState extends State<TransactionsPage> {
 
   Widget _buildTransactionList(List<Transaccion> transactions) {
     if (transactions.isEmpty) {
+  
       return Center(child: Text('No hay transacciones para este día.'));
+      
     }
 
     return ListView.builder(
