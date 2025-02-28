@@ -16,6 +16,7 @@ import 'package:moni/views/screens/statistics.dart';
 import 'package:moni/views/screens/transactions.dart';
 import 'package:provider/provider.dart';
 import 'package:moni/views/screens/addTransactions.dart';
+import 'package:moni/views/screens/addAccount.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -71,6 +72,7 @@ class MyApp extends StatelessWidget {
         '/income_offers': (context) => IncomeOffersPage(),
         '/categories': (context) => CategoriesPage(),
         '/accounts': (context) => AccountsPage(),
+        '/addAccounts': (context) => AddAccountPage(),
       },
       initialRoute: '/home', // Ruta inicial de la aplicación
     );

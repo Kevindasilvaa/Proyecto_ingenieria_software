@@ -62,8 +62,8 @@ class _TransactionsPageState extends State<TransactionsPage> {
         title: Text('Transacciones'),
       ),
       drawer: CustomDrawer(),
-      body: SafeArea(
-        child: Column(
+      body:
+        Column(
           children: [
             Container(
               width: double.infinity,
@@ -104,7 +104,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
                   : Center(child: CircularProgressIndicator()),
             ),
             Container(
-              height: 80.0,
+              height: 100.0,
               child: NavBar(
                 onPlusPressed: () {
                   Navigator.of(context).pushNamed('/addTransactions');
@@ -114,7 +114,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
             ),
           ],
         ),
-      ),
+      
     );
   }
 
@@ -170,48 +170,59 @@ class _TransactionsPageState extends State<TransactionsPage> {
                       ],
                     ),
                     IconButton(
-                      icon: Icon(Icons.delete, color: Colors.red),
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: Text("Confirmar eliminación"),
-                              content:
-                                  Text("¿Seguro que desea eliminar esta transacción?"),
-                              actions: <Widget>[
-                                TextButton(
-                                  child: Text("Cancelar"),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                                TextButton(
-                                  child: Text("Eliminar"),
-                                  onPressed: () {
-                                    _transaccionesController
-                                        .eliminarTransaccion(transaccion.id)
-                                        .then((_) {
-                                      Navigator.of(context).pop();
-                                      _cargarTransacciones(_selectedDay);
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(
-                                              content: Text(
-                                                  'Transacción eliminada')));
-                                    }).catchError((error) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(
-                                              content: Text(
-                                                  'Error al eliminar')));
-                                    });
-                                  },
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      },
-                    ),
+                        icon: Icon(Icons.delete, color: Colors.red),
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              bool _isLoading = false; // Add loading state
+
+                              return StatefulBuilder( // Use StatefulBuilder to update the dialog's state
+                                builder: (BuildContext context, StateSetter setState) {
+                                  return AlertDialog(
+                                    title: Text("Confirmar eliminación"),
+                                    content: _isLoading
+                                        ? Center(child: CircularProgressIndicator()) // Show loading indicator
+                                        : Text("¿Seguro que desea eliminar esta transacción?"),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        child: Text("Cancelar"),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                      TextButton(
+                                        child: Text("Eliminar"),
+                                        onPressed: _isLoading
+                                            ? null // Disable button while loading
+                                            : () async {
+                                                setState(() {
+                                                  _isLoading = true; // Start loading
+                                                });
+                                                try {
+                                                  await _transaccionesController.eliminarTransaccion(transaccion);
+                                                  Navigator.of(context).pop();
+                                                  _cargarTransacciones(_selectedDay);
+                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                      SnackBar(content: Text('Transacción eliminada')));
+                                                } catch (error) {
+                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                      SnackBar(content: Text('Error al eliminar')));
+                                                } finally {
+                                                  setState(() {
+                                                    _isLoading = false; // Stop loading
+                                                  });
+                                                }
+                                              },
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+                          );
+                        },
+                      ),
                      IconButton(
                         icon: Icon(Icons.edit, color: const Color.fromARGB(255, 255, 119, 0)),
                         onPressed: () {
@@ -235,7 +246,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
                     Text(
                       '${transaccion.monto}',
                       style: TextStyle(
-                        color: transaccion.ingreso ? Colors.red : Colors.green,
+                        color: transaccion.ingreso ? Colors.green : Colors.red,
                       ),
                     ),
                     SizedBox(width: 7)

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:moni/models/dbHelper/firebase_service.dart';
 import 'package:moni/models/clases/Usuario.dart';
 import 'package:flutter/material.dart';
@@ -107,15 +108,71 @@ class UserController with ChangeNotifier {  // Cambié esto a "with ChangeNotifi
   }
 
   // En user_controller.dart
-Future<void> actualizarUsuarioEnFirestore(Usuario usuario) async {
-  try {
-    await FirebaseFirestore.instance
-        .collection('users') // Reemplaza 'users' con tu colección
-        .doc(usuario.id)
-        .update(usuario.toMap()); // Usa el método toMap de tu clase Usuario
-  } catch (e) {
-    print('Error al actualizar usuario en Firestore: $e');
-    rethrow; // Re-lanza el error para que se pueda manejar en la UI
+  Future<void> actualizarUsuarioEnFirestore(Usuario usuario) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('users') // Reemplaza 'users' con tu colección
+          .doc(usuario.id)
+          .update(usuario.toMap()); // Usa el método toMap de tu clase Usuario
+    } catch (e) {
+      print('Error al actualizar usuario en Firestore: $e');
+      rethrow; // Re-lanza el error para que se pueda manejar en la UI
+    }
   }
-}
+  
+  // Este metodo funciona tanto para Iniciar sesion como para crear una cuenta
+  Future<void> signInWithGoogle() async {
+    try {
+      // 1. Iniciar sesión con Google
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+      // 2. Obtener las credenciales de autenticación de Google
+      final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
+
+      // 3. Crear una credencial de Firebase con las credenciales de Google
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth?.accessToken,
+        idToken: googleAuth?.idToken,
+      );
+
+      // 4. Autenticarse con Firebase usando la credencial
+      final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+      UserCredential userCredential = await _firebaseAuth.signInWithCredential(credential);
+
+      // 5. Obtener el usuario de Firebase
+      User? firebaseUser = userCredential.user;
+
+      if (firebaseUser != null) {
+        // 6. Verificar si el usuario ya existe en Firestore
+        final userDoc = await FirebaseFirestore.instance
+            .collection('users') // Reemplaza 'users' con tu colección
+            .doc(firebaseUser.uid)
+            .get();
+
+        if (!userDoc.exists) {
+          // 7. Si el usuario es nuevo, crearlo en Firestore
+          final newUser = Usuario(
+            id: firebaseUser.uid,
+            email: firebaseUser?.email ?? '',
+            name: firebaseUser.displayName ?? '',
+          );
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(newUser.id)
+              .set(newUser.toMap());
+
+          _usuario = newUser; // Actualiza _usuario con el nuevo usuario
+        } else {
+          // 8. Si el usuario ya existe, obtener sus datos de Firestore
+          final user = await getUserByEmail(firebaseUser.email!);
+          _usuario = user; // Actualiza _usuario con el usuario existente
+        }
+
+        notifyListeners(); // Notifica que el usuario ha sido actualizado
+      }
+    } catch (e) {
+      print('Error al iniciar sesión con Google: $e');
+      rethrow; // Re-lanza el error para que se pueda manejar en la UI
+    }
+  }
 }

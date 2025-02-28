@@ -81,114 +81,14 @@ class CategoriesPage extends StatelessWidget {
       BuildContext context, CategoryController categoryController) {
     TextEditingController nameController = TextEditingController();
     String selectedIcon = '📚';
-    Color selectedColor = Colors.red;
-    List<Color> colorOptions = [
-      Colors.red,
-      Colors.blue,
-      Colors.yellow,
-      Colors.orange,
-      Colors.green,
-      Colors.pink,
-      Colors.grey
-    ];
 
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          title: Center(
-            child: Text(
-              'Crear Categoría',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              TextField(
-                controller: nameController,
-                textAlign: TextAlign.center,
-                decoration: InputDecoration(
-                  labelText: 'Nombre de la categoría',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.category),
-                ),
-              ),
-              SizedBox(height: 16),
-              DropdownButtonFormField<String>(
-                value: selectedIcon,
-                decoration: InputDecoration(
-                  labelText: 'Seleccionar Logo',
-                  border: OutlineInputBorder(),
-                ),
-                items: ['📚', '🛒', '🎮', '💼', '🚗', '🍔', '🏠']
-                    .map((e) => DropdownMenuItem(
-                        value: e, child: Center(child: Text(e))))
-                    .toList(),
-                onChanged: (value) {
-                  if (value != null) selectedIcon = value;
-                },
-              ),
-              SizedBox(height: 16),
-              Text(
-                'Seleccionar Color',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: colorOptions.map((color) {
-                  return GestureDetector(
-                    onTap: () {
-                      selectedColor = color;
-                    },
-                    child: Container(
-                      width: 30,
-                      height: 30,
-                      margin: EdgeInsets.symmetric(horizontal: 5),
-                      decoration: BoxDecoration(
-                        color: color,
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                            color: selectedColor == color
-                                ? Colors.black
-                                : Colors.transparent,
-                            width: 2),
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
-            ],
-          ),
-          actions: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text('Cancelar'),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    if (nameController.text.isNotEmpty) {
-                      categoryController
-                          .addCategory(
-                              nameController.text, selectedIcon, selectedColor)
-                          .then((_) {
-                        Navigator.pop(context);
-                      });
-                    }
-                  },
-                  child: Text('Agregar'),
-                ),
-              ],
-            ),
-          ],
+        return CreateCategoryDialog(
+          nameController: nameController,
+          selectedIcon: selectedIcon,
+          categoryController: categoryController,
         );
       },
     );
@@ -196,14 +96,11 @@ class CategoriesPage extends StatelessWidget {
 
   void _showDeleteConfirmationDialog(BuildContext context,
       CategoryController categoryController, String categoryId) {
-    // Obtener la categoría antes de mostrar el diálogo para verificar su email
     categoryController.getCategoryById(categoryId).then((category) {
       if (category?.user_email == 'all_users@domain.com') {
-        // Si la categoría es global, no permitir eliminarla
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text('No puedes eliminar una categoría global.')));
       } else {
-        // Si no es global, permitir la eliminación
         showDialog(
           context: context,
           builder: (context) {
@@ -222,7 +119,7 @@ class CategoriesPage extends StatelessWidget {
                     });
                   },
                   child: Text('Eliminar'),
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                  //style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
                 ),
               ],
             );
@@ -230,5 +127,143 @@ class CategoriesPage extends StatelessWidget {
         );
       }
     });
+  }
+}
+
+class CreateCategoryDialog extends StatefulWidget {
+  final TextEditingController nameController;
+  final String selectedIcon;
+  final CategoryController categoryController;
+
+  CreateCategoryDialog({
+    required this.nameController,
+    required this.selectedIcon,
+    required this.categoryController,
+  });
+
+  @override
+  _CreateCategoryDialogState createState() => _CreateCategoryDialogState();
+}
+
+class _CreateCategoryDialogState extends State<CreateCategoryDialog> {
+  String selectedIcon = '📚';
+  Color selectedColor = Colors.red;
+
+  List<Color> colorOptions = [
+    Colors.red,
+    Colors.blue,
+    Colors.yellow,
+    Colors.orange,
+    Colors.green,
+    Colors.grey
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    selectedIcon = widget.selectedIcon;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      title: Center(
+        child: Text(
+          'Crear Categoría',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+      ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          TextField(
+            controller: widget.nameController,
+            textAlign: TextAlign.center,
+            decoration: InputDecoration(
+              labelText: 'Nombre de la categoría',
+              border: OutlineInputBorder(),
+              prefixIcon: Icon(Icons.category),
+            ),
+          ),
+          SizedBox(height: 16),
+          DropdownButtonFormField<String>(
+            value: selectedIcon,
+            decoration: InputDecoration(
+              labelText: 'Seleccionar Logo',
+              border: OutlineInputBorder(),
+            ),
+            items: ['📚', '🛒', '🎮', '💼', '🚗', '🍔', '🏠']
+                .map((e) => DropdownMenuItem(
+                    value: e, child: Center(child: Text(e))))
+                .toList(),
+            onChanged: (value) {
+              if (value != null) setState(() {
+                selectedIcon = value;
+              });
+            },
+          ),
+          SizedBox(height: 16),
+          Text(
+            'Seleccionar Color',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: colorOptions.map((color) {
+              return GestureDetector(
+                onTap: () {
+                  setState(() {
+                    selectedColor = color;
+                  });
+                },
+                child: Container(
+                  width: 30,
+                  height: 30,
+                  margin: EdgeInsets.symmetric(horizontal: 5),
+                  decoration: BoxDecoration(
+                    color: color,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                        color: selectedColor == color
+                            ? Colors.black
+                            : Colors.transparent,
+                        width: 2),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+      actions: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Cancelar'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (widget.nameController.text.isNotEmpty) {
+                  widget.categoryController
+                      .addCategory(
+                          widget.nameController.text, selectedIcon, selectedColor)
+                      .then((_) {
+                    Navigator.pop(context);
+                  });
+                }
+              },
+              child: Text('Agregar'),
+            ),
+          ],
+        ),
+      ],
+    );
   }
 }

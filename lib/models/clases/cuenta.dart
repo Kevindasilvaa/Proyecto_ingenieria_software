@@ -15,7 +15,7 @@
 //     required this.saldo,
 //     required this.fechaCreacion,
 //     required this.userEmail,
-//     required this.tipoMoneda, 
+//     required this.tipoMoneda,
 //     idCuenta,
 //   }) {
 //     generarIdCuenta(); // Generar el ID al crear la cuenta
@@ -70,8 +70,8 @@ class Cuenta {
     required this.saldo,
     required this.fechaCreacion,
     required this.userEmail,
-    required this.tipoMoneda, 
-    String? idCuenta,  // Se hace opcional
+    required this.tipoMoneda,
+    String? idCuenta, // Se hace opcional
   }) {
     this.idCuenta = idCuenta ?? generarIdCuenta(); // Si no se pasa, se genera
   }
@@ -101,10 +101,12 @@ class Cuenta {
   }
 
   String generarIdCuenta() {
-    const caracteres = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    const caracteres =
+        'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     Random random = Random();
     return String.fromCharCodes(
-      Iterable.generate(50, (_) => caracteres.codeUnitAt(random.nextInt(caracteres.length))),
+      Iterable.generate(
+          50, (_) => caracteres.codeUnitAt(random.nextInt(caracteres.length))),
     );
   }
 }
