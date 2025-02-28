@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:moni/views/widgets/CustomButton.dart';
 import 'package:moni/views/widgets/NavBar.dart'; // Importa tu widget NavBar
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:moni/models/clases/transaccion.dart';
@@ -25,8 +27,9 @@ class _AddTransactionsPageState extends State<AddTransactionsPage> {
   final _montoController = TextEditingController();
   String? _categoriaSeleccionada;
   String? _cuentaSeleccionada;
-  DateTime? _fechaSeleccionada;
+  DateTime? _fechaSeleccionada = DateTime.now();
   final _nombreController = TextEditingController();
+  bool _isLoading = false;
 
   List<Category> _categorias = [];
   List<Cuenta> _cuentas = [];
@@ -176,13 +179,17 @@ class _AddTransactionsPageState extends State<AddTransactionsPage> {
                               width: 120,
                               child: TextFormField(
                                 controller: _montoController,
-                                keyboardType: TextInputType.number,
+                                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                                inputFormatters: [
+                                  // Permitir solo números y un solo punto decimal
+                                  FilteringTextInputFormatter.allow(RegExp(r'^\d+(\.\d{0,2})?$')),
+                                ],
                                 decoration: InputDecoration(
                                   alignLabelWithHint: true,
                                   focusedBorder: UnderlineInputBorder(
                                     borderSide: BorderSide(
-                                        color: const Color.fromARGB(
-                                            255, 191, 191, 191)),
+                                      color: const Color.fromARGB(255, 191, 191, 191),
+                                    ),
                                   ),
                                 ),
                                 textAlign: TextAlign.center,
@@ -193,7 +200,8 @@ class _AddTransactionsPageState extends State<AddTransactionsPage> {
                                 validator: (value) {
                                   if (value == null ||
                                       value.isEmpty ||
-                                      double.tryParse(value) == null) {
+                                      double.tryParse(value) == null ||
+                                      !RegExp(r'^\d+(\.\d{0,2})?$').hasMatch(value)) {
                                     return "Ingrese un número válido";
                                   }
                                   return null;
@@ -222,8 +230,8 @@ class _AddTransactionsPageState extends State<AddTransactionsPage> {
                               child: TextFormField(
                                 controller: _nombreController,
                                 decoration: InputDecoration(
-                                  prefixIcon: Icon(Icons.person),
-                                  labelText: 'Name',
+                                  prefixIcon: Icon(Icons.receipt),
+                                  labelText: 'Nombre',
                                   labelStyle: TextStyle(
                                       color:
                                           const Color.fromARGB(255, 0, 0, 0)),
@@ -259,7 +267,7 @@ class _AddTransactionsPageState extends State<AddTransactionsPage> {
                             }).toList(),
                             validator: (value) {
                               if (value == null) {
-                                return 'Select an account';
+                                return 'Selecciona una cuenta';
                               }
                               return null;
                             },
@@ -295,7 +303,7 @@ class _AddTransactionsPageState extends State<AddTransactionsPage> {
                                 }).toList(),
                                 validator: (value) {
                                   if (value == null) {
-                                    return 'Select a category';
+                                    return 'Selecciona una categoria';
                                   }
                                   return null;
                                 },
@@ -309,7 +317,7 @@ class _AddTransactionsPageState extends State<AddTransactionsPage> {
                               child: TextFormField(
                                 controller: _descripcionController,
                                 decoration: InputDecoration(
-                                  prefixIcon: Icon(Icons.flag),
+                                  prefixIcon: Icon(Icons.description),
                                   labelText: 'Descripcion',
                                   labelStyle: TextStyle(
                                       color:
@@ -317,12 +325,6 @@ class _AddTransactionsPageState extends State<AddTransactionsPage> {
                                   border: InputBorder.none,
                                   contentPadding: EdgeInsets.all(16.0),
                                 ),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Ingrese la descripción';
-                                  }
-                                  return null;
-                                },
                               ),
                             ),
                             SizedBox(height: 15.0),
@@ -388,101 +390,100 @@ class _AddTransactionsPageState extends State<AddTransactionsPage> {
                               ),
                             ),
                             SizedBox(height: 15.0),
-                            ElevatedButton(
-                              onPressed: () async {
-                                if (_formKey.currentState!.validate()) {
-                                  final nuevaTransaccion = Transaccion(
-                                    id: '',
-                                    user_id: FirebaseAuth
-                                        .instance.currentUser!.uid,
-                                    nombre: _nombreController.text,
-                                    categoria_id: _categoriaSeleccionada!,
-                                    descripcion: _descripcionController.text,
-                                    fecha: _fechaSeleccionada!,
-                                    ingreso: _ingreso,
-                                    monto:double.parse(_montoController.text),
-                                    cuenta_id: _cuentaSeleccionada!,
-                                  );
-                                  
+                            Column(
+                              children: [
+                                // Aquí es donde ponemos el botón o la barra de carga
+                                _isLoading
+                                    ? CircularProgressIndicator() // Muestra la barra de carga
+                                    : CustomButton(
+                                        onPressed: () async {
+                                          setState(() {
+                                            _isLoading = true; // Muestra el indicador de carga
+                                          });
 
-                                  try {
-                                  // 1. Obtener la cuenta seleccionada
-                                  final cuentaSeleccionada = _cuentas.firstWhere(
-                                      (cuenta) => cuenta.idCuenta == _cuentaSeleccionada);
+                                          if (_formKey.currentState!.validate()) {
+                                            final nuevaTransaccion = Transaccion(
+                                              id: '',
+                                              user_id: FirebaseAuth.instance.currentUser!.uid,
+                                              nombre: _nombreController.text,
+                                              categoria_id: _categoriaSeleccionada!,
+                                              descripcion: _descripcionController.text,
+                                              fecha: _fechaSeleccionada!,
+                                              ingreso: _ingreso,
+                                              monto: double.parse(_montoController.text),
+                                              cuenta_id: _cuentaSeleccionada!,
+                                            );
 
-                                  // 2. Calcular el nuevo saldo
-                                  double nuevoSaldo = _ingreso
-                                      ? cuentaSeleccionada.saldo +
-                                          double.parse(_montoController.text)
-                                      : cuentaSeleccionada.saldo -
-                                          double.parse(_montoController.text);
+                                            try {
+                                              // 1. Obtener la cuenta seleccionada
+                                              final cuentaSeleccionada = _cuentas.firstWhere(
+                                                  (cuenta) => cuenta.idCuenta == _cuentaSeleccionada);
 
-                                  // 3. Crear una copia de la cuenta con el nuevo saldo
-                                  final cuentaModificada = Cuenta(
-                                    idCuenta: cuentaSeleccionada.idCuenta,
-                                    nombre: cuentaSeleccionada.nombre,
-                                    saldo: nuevoSaldo,
-                                    userEmail: cuentaSeleccionada.userEmail,
-                                    fechaCreacion: cuentaSeleccionada.fechaCreacion,
-                                    tipo: cuentaSeleccionada.tipo,
-                                    tipoMoneda: cuentaSeleccionada.tipoMoneda,
-                                  );
+                                              // 2. Calcular el nuevo saldo
+                                              double nuevoSaldo = _ingreso
+                                                  ? cuentaSeleccionada.saldo + double.parse(_montoController.text)
+                                                  : cuentaSeleccionada.saldo - double.parse(_montoController.text);
 
-                                  print(cuentaModificada.saldo);
+                                              // 3. Crear una copia de la cuenta con el nuevo saldo
+                                              final cuentaModificada = Cuenta(
+                                                idCuenta: cuentaSeleccionada.idCuenta,
+                                                nombre: cuentaSeleccionada.nombre,
+                                                saldo: nuevoSaldo,
+                                                userEmail: cuentaSeleccionada.userEmail,
+                                                fechaCreacion: cuentaSeleccionada.fechaCreacion,
+                                                tipo: cuentaSeleccionada.tipo,
+                                                tipoMoneda: cuentaSeleccionada.tipoMoneda,
+                                              );
 
-                                  // 4. Modificar la cuenta en Firestore
-                                  await Provider.of<CuentaController>(context,
-                                          listen: false)
-                                      .modificarCuenta(cuentaModificada);
+                                              print(cuentaModificada.saldo);
 
+                                              // 4. Modificar la cuenta en Firestore
+                                              await Provider.of<CuentaController>(context, listen: false)
+                                                  .modificarCuenta(cuentaModificada);
 
-                                  // 5. Agregar la transacción
-                                  await _controller
-                                      .agregarTransaccion(nuevaTransaccion);
+                                              // 5. Agregar la transacción
+                                              await _controller.agregarTransaccion(nuevaTransaccion);
 
-                                  
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                          content:
-                                              Text('Transacción agregada')),
-                                    );
+                                              // Mostrar un mensaje de éxito
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                SnackBar(content: Text('Transacción agregada')),
+                                              );
 
-                                    _formKey.currentState!.reset();
-                                    setState(() {
-                                      _fechaSeleccionada = null;
-                                      _categoriaSeleccionada = null;
-                                      _cuentaSeleccionada = null;
-                                      _montoController.clear();
-                                      _nombreController.clear();
-                                      _descripcionController.clear();
-                                    });
-                                  } catch (e) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                          content: Text(
-                                              'Error al agregar transacción: $e')),
-                                    );
-                                    print('Error adding transaction: $e');
-                                  }
-                                }
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    const Color.fromARGB(255, 100, 100, 100),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10.0),
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 16.0, horizontal: 24.0),
-                              ),
-                              child: const Text(
-                                'AGREGAR',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                ),
-                              ),
+                                              // Se agrega la transacción y se navega al home
+                                              Navigator.pushReplacementNamed(context, '/home');
+
+                                              // Restablecer el formulario
+                                              _formKey.currentState!.reset();
+                                              setState(() {
+                                                _fechaSeleccionada = null;
+                                                _categoriaSeleccionada = null;
+                                                _cuentaSeleccionada = null;
+                                                _montoController.clear();
+                                                _nombreController.clear();
+                                                _descripcionController.clear();
+                                              });
+                                            } catch (e) {
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                SnackBar(content: Text('Error al agregar transacción: $e')),
+                                              );
+                                              print('Error adding transaction: $e');
+                                            } finally {
+                                              setState(() {
+                                                _isLoading = false; // Ocultar el indicador de carga
+                                              });
+                                            }
+                                          } else {
+                                            setState(() {
+                                              _isLoading = false; // Ocultar el indicador de carga si la validación falla
+                                            });
+                                          }
+                                        },
+                                        text: 'AGREGAR',
+                                      ),
+                                SizedBox(height: 18.0),
+                              ],
                             ),
-                            SizedBox(height: 18.0),
+
                           ],
                         ),
                       ),
