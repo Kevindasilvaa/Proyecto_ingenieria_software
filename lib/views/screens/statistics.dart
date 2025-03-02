@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:moni/controllers/user_controller.dart';
+import 'package:moni/views/widgets/TransactionCard.dart';
 import 'package:provider/provider.dart';
 import 'package:moni/views/widgets/NavBar.dart';
 import 'package:moni/views/widgets/CustomDrawer.dart';
@@ -23,6 +25,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
   List<Category> _categorias = [];
 
   List<PieChartSectionData> _pieChartSections = [];
+  List<Transaccion> _transaccionesFiltradas = []; // Lista de transacciones filtradas
 
   @override
   void initState() {
@@ -97,15 +100,24 @@ class _StatisticsPageState extends State<StatisticsPage> {
     DateTime firstDayOfMonth = DateTime(_selectedDate.year, _selectedDate.month, 1);
     DateTime lastDayOfMonth = DateTime(_selectedDate.year, _selectedDate.month + 1, 0);
 
-    return await _transaccionesController
+    List<Transaccion> transacciones = await _transaccionesController
         .obtenerTransaccionesUsuarioStream()
-        .first
-        .then((transacciones) => transacciones
-            .where((transaccion) =>
-                transaccion.ingreso == _ingreso &&
-                transaccion.fecha.isAfter(firstDayOfMonth) &&
-                transaccion.fecha.isBefore(lastDayOfMonth.add(Duration(days: 1))))
-            .toList());
+        .first;
+
+    // Filtrar las transacciones según la fecha y el tipo de transacción (_ingreso)
+    List<Transaccion> filteredTransacciones = transacciones
+        .where((transaccion) =>
+            transaccion.ingreso == _ingreso &&
+            transaccion.fecha.isAfter(firstDayOfMonth) &&
+            transaccion.fecha.isBefore(lastDayOfMonth.add(Duration(days: 1))))
+        .toList();
+
+    // Actualizar la lista de transacciones filtradas
+    setState(() {
+      _transaccionesFiltradas = filteredTransacciones;
+    });
+
+    return filteredTransacciones;
   }
 
 Widget _buildLegend() {
@@ -158,12 +170,11 @@ Widget _buildLegend() {
         title: Text('Estadísticas'),
       ),
       drawer: CustomDrawer(),
-      body: SafeArea(
-        child: Column(
+      body: Column(
           children: [
             Container(
               width: double.infinity,
-              height: 25,
+              height: 0,
               decoration: BoxDecoration(
                 color: Colors.grey[200],
                 borderRadius: BorderRadius.only(
@@ -329,10 +340,64 @@ Widget _buildLegend() {
                           Positioned(
                             top: 4,
                             left: 8,
-                            child: Text('Gasto total', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)), 
+                            child: Text('Total', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)), 
                           ),
+                          // Monto Total
                           Center(
-                            child: Text('000', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)), 
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                // Si es gasto o ingreso, mostrar el signo y el monto
+                                _ingreso
+                                    ? Text(
+                                        '+ ${_transaccionesFiltradas.isNotEmpty
+                                            ? NumberFormat('#,##0.00', 'es_ES').format(
+                                                _transaccionesFiltradas.fold(0.0, (sum, transaccion) => sum + transaccion.monto))
+                                            : '0.00'}',
+                                        style: TextStyle(
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.green, // Verde para ingresos
+                                        ),
+                                      )
+                                    : Text(
+                                        '- ${_transaccionesFiltradas.isNotEmpty
+                                            ? NumberFormat('#,##0.00', 'es_ES').format(
+                                                _transaccionesFiltradas.fold(0.0, (sum, transaccion) => sum + transaccion.monto))
+                                            : '0.00'}',
+                                        style: TextStyle(
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.red, // Rojo para gastos
+                                        ),
+                                      ),
+                                
+                                // Icono de flecha con fondo
+                                _ingreso
+                                    ? Container(
+                                        padding: EdgeInsets.all(5), // Añadir algo de espacio alrededor del ícono
+                                        decoration: BoxDecoration(
+                                          color: Colors.green.withOpacity(0.3), // Fondo verde más claro
+                                          shape: BoxShape.circle, // Hacer el fondo circular
+                                        ),
+                                        child: Icon(
+                                          Icons.arrow_upward,
+                                          color: Colors.green, // Flecha verde
+                                        ),
+                                      )
+                                    : Container(
+                                        padding: EdgeInsets.all(5), // Añadir algo de espacio alrededor del ícono
+                                        decoration: BoxDecoration(
+                                          color: Colors.red.withOpacity(0.3), // Fondo rojo más claro
+                                          shape: BoxShape.circle, // Hacer el fondo circular
+                                        ),
+                                        child: Icon(
+                                          Icons.arrow_downward,
+                                          color: Colors.red, // Flecha roja
+                                        ),
+                                      ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
@@ -344,11 +409,32 @@ Widget _buildLegend() {
             
             Expanded(
               child: Center(
-                child: Text("Relleno"),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // SizedBox(height: 10),
+                    // Text(
+                    //   "Transacciones",
+                    //   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    // ),
+                    SizedBox(height: 10),
+                    // Aquí agregamos un ListView para mostrar las transacciones filtradas
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: _transaccionesFiltradas.length,
+                        itemBuilder: (context, index) {
+                          return TransactionCard(
+                            transaccion: _transaccionesFiltradas[index],
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
             Container(
-              height: 80.0,
+              height: 100.0,
               child: NavBar(
                 onPlusPressed: () {
                   Navigator.of(context).pushNamed('/addTransactions');
@@ -357,7 +443,6 @@ Widget _buildLegend() {
               ),
             ),
           ],
-        ),
       ),
     );
   }
