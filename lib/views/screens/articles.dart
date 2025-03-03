@@ -1,3 +1,4 @@
+// lib/views/screens/articles.dart
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:moni/models/clases/article.dart';
@@ -8,14 +9,33 @@ class ArticlesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Obtenemos las dimensiones del viewport.
+    final viewportHeight = MediaQuery.of(context).size.height;
+    final viewportWidth = MediaQuery.of(context).size.width;
+
+    // Queremos que cada tarjeta tenga el 70% de la altura del viewport.
+    final cardHeight = viewportHeight * 0.7;
+
+    // Suponiendo un padding general y spacing, vamos a calcular el ancho de cada tarjeta.
+    // Por ejemplo, si usamos un padding de 8 en cada lado y un crossAxisSpacing de 8:
+    final totalHorizontalPadding = 8 * 2; // padding de la GridView
+    final crossAxisSpacing = 8.0;
+    // Para 2 columnas, el ancho disponible es:
+    final availableWidth =
+        viewportWidth - totalHorizontalPadding - crossAxisSpacing;
+    final cardWidth = availableWidth / 2;
+
+    // Calculamos el childAspectRatio = ancho / altura.
+    final childAspectRatio = cardWidth / cardHeight;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Artículos Financieros"),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
-            .collection('Articulos') // Nombre de la colección
-            .orderBy('Fecha', descending: true) // Campo en mayúscula
+            .collection('Articulos') // Nombre exacto de la colección
+            .orderBy('Fecha', descending: true)
             .limit(10)
             .snapshots(),
         builder: (context, snapshot) {
@@ -28,7 +48,6 @@ class ArticlesPage extends StatelessWidget {
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
             return const Center(child: Text("No hay artículos disponibles"));
           }
-          // Mapear los documentos a objetos Article usando los atributos en mayúsculas
           List<Article> articles = snapshot.data!.docs.map((doc) {
             Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
             return Article(
@@ -42,11 +61,11 @@ class ArticlesPage extends StatelessWidget {
 
           return GridView.builder(
             padding: const EdgeInsets.all(8.0),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2, // 2 columnas
-              crossAxisSpacing: 8,
-              mainAxisSpacing: 8,
-              childAspectRatio: 0.75,
+              crossAxisSpacing: crossAxisSpacing,
+              mainAxisSpacing: 8.0,
+              childAspectRatio: childAspectRatio,
             ),
             itemCount: articles.length,
             itemBuilder: (context, index) {
