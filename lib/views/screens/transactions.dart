@@ -10,7 +10,7 @@ import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
 import 'package:moni/views/widgets/EditTransaction.dart';
-
+import 'package:moni/views/widgets/TransactionCard.dart'; // Importa el widget TransactionCard
 
 class TransactionsPage extends StatefulWidget {
   @override
@@ -62,59 +62,57 @@ class _TransactionsPageState extends State<TransactionsPage> {
         title: Text('Transacciones'),
       ),
       drawer: CustomDrawer(),
-      body:
-        Column(
-          children: [
-            Container(
-              width: double.infinity,
-              height: 25,
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(45),
-                  bottomRight: Radius.circular(45),
-                ),
+      body: Column(
+        children: [
+          Container(
+            width: double.infinity,
+            height: 25,
+            decoration: BoxDecoration(
+              color: Colors.grey[200],
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(45),
+                bottomRight: Radius.circular(45),
               ),
             ),
-            TableCalendar(
-              focusedDay: _focusedDay,
-              firstDay: DateTime.utc(2010, 10, 16),
-              lastDay: DateTime.utc(2030, 3, 14),
-              calendarFormat: _format,
-              selectedDayPredicate: (day) {
-                return isSameDay(_selectedDay, day);
+          ),
+          TableCalendar(
+            focusedDay: _focusedDay,
+            firstDay: DateTime.utc(2010, 10, 16),
+            lastDay: DateTime.utc(2030, 3, 14),
+            calendarFormat: _format,
+            selectedDayPredicate: (day) {
+              return isSameDay(_selectedDay, day);
+            },
+            onDaySelected: (selectedDay, focusedDay) {
+              setState(() {
+                _selectedDay = selectedDay;
+                _focusedDay = focusedDay;
+                _cargarTransacciones(_selectedDay);
+              });
+            },
+            onFormatChanged: (format) {
+              setState(() {
+                _format = format;
+              });
+            },
+          ),
+          SizedBox(height: 16),
+          Expanded(
+            child: userController.usuario != null
+                ? _buildTransactionList(_transactions)
+                : Center(child: CircularProgressIndicator()),
+          ),
+          Container(
+            height: 100.0,
+            child: NavBar(
+              onPlusPressed: () {
+                Navigator.of(context).pushNamed('/addTransactions');
               },
-              onDaySelected: (selectedDay, focusedDay) {
-                setState(() {
-                  _selectedDay = selectedDay;
-                  _focusedDay = focusedDay;
-                  _cargarTransacciones(_selectedDay);
-                });
-              },
-              onFormatChanged: (format) {
-                setState(() {
-                  _format = format;
-                });
-              },
+              currentPage: '/transactions',
             ),
-            SizedBox(height: 16),
-            Expanded(
-              child: userController.usuario != null
-                  ? _buildTransactionList(_transactions)
-                  : Center(child: CircularProgressIndicator()),
-            ),
-            Container(
-              height: 100.0,
-              child: NavBar(
-                onPlusPressed: () {
-                  Navigator.of(context).pushNamed('/addTransactions');
-                },
-                currentPage: '/transactions',
-              ),
-            ),
-          ],
-        ),
-      
+          ),
+        ],
+      ),
     );
   }
 
@@ -127,134 +125,8 @@ class _TransactionsPageState extends State<TransactionsPage> {
       itemCount: transactions.length,
       itemBuilder: (context, index) {
         final transaccion = transactions[index];
-        return _buildTransactionContainer(transaccion);
+        return TransactionCard(transaccion: transaccion); // Usamos TransactionCard aquí
       },
-    );
-  }
-
-  Widget _buildTransactionContainer(Transaccion transaccion) {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 2, horizontal: 16),
-      padding: EdgeInsets.only(left: 16, right: 16, top: 4, bottom: 4),
-      decoration: BoxDecoration(
-        color: const Color.fromARGB(247, 247, 247, 247),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.3),
-            spreadRadius: 2,
-            blurRadius: 5,
-            offset: Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-         
-          Expanded(
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          transaccion.nombre,
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Text(DateFormat('yyyy-MM-dd').format(transaccion.fecha)),
-                      ],
-                    ),
-                    IconButton(
-                        icon: Icon(Icons.delete, color: Colors.red),
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              bool _isLoading = false; // Add loading state
-
-                              return StatefulBuilder( // Use StatefulBuilder to update the dialog's state
-                                builder: (BuildContext context, StateSetter setState) {
-                                  return AlertDialog(
-                                    title: Text("Confirmar eliminación"),
-                                    content: _isLoading
-                                        ? Center(child: CircularProgressIndicator()) // Show loading indicator
-                                        : Text("¿Seguro que desea eliminar esta transacción?"),
-                                    actions: <Widget>[
-                                      TextButton(
-                                        child: Text("Cancelar"),
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                      ),
-                                      TextButton(
-                                        child: Text("Eliminar"),
-                                        onPressed: _isLoading
-                                            ? null // Disable button while loading
-                                            : () async {
-                                                setState(() {
-                                                  _isLoading = true; // Start loading
-                                                });
-                                                try {
-                                                  await _transaccionesController.eliminarTransaccion(transaccion);
-                                                  Navigator.of(context).pop();
-                                                  _cargarTransacciones(_selectedDay);
-                                                  ScaffoldMessenger.of(context).showSnackBar(
-                                                      SnackBar(content: Text('Transacción eliminada')));
-                                                } catch (error) {
-                                                  ScaffoldMessenger.of(context).showSnackBar(
-                                                      SnackBar(content: Text('Error al eliminar')));
-                                                } finally {
-                                                  setState(() {
-                                                    _isLoading = false; // Stop loading
-                                                  });
-                                                }
-                                              },
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                            },
-                          );
-                        },
-                      ),
-                     IconButton(
-                        icon: Icon(Icons.edit, color: const Color.fromARGB(255, 255, 119, 0)),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => EditTransaction(transaction: transaccion),
-                            ),
-                          ).then((result) {
-                            if (result != null && result == true) {
-                              _cargarTransacciones(_selectedDay);
-                            }
-                          });
-                        },
-                      ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Text(
-                      '${transaccion.monto}',
-                      style: TextStyle(
-                        color: transaccion.ingreso ? Colors.green : Colors.red,
-                      ),
-                    ),
-                    SizedBox(width: 7)
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
