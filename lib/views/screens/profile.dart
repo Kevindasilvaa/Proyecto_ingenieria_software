@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:moni/controllers/user_controller.dart';
 import 'package:moni/models/clases/Usuario.dart';
@@ -21,6 +22,8 @@ class _ProfilePageState extends State<ProfilePage> {
   final TextEditingController _birthdateController = TextEditingController();
   final TextEditingController _countryController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _incomeBudgetController = TextEditingController();
+  final TextEditingController _expenseBudgetController = TextEditingController();
 
   @override
   void initState() {
@@ -31,7 +34,7 @@ class _ProfilePageState extends State<ProfilePage> {
   void _loadUserData() {
     final userController = Provider.of<UserController>(context, listen: false);
     final user = userController.usuario;
-    
+
     if (user != null) {
       _nameController.text = user.name ?? 'No disponible';
       _emailController.text = user.email ?? 'No disponible';
@@ -41,6 +44,8 @@ class _ProfilePageState extends State<ProfilePage> {
           : 'No disponible';
       _countryController.text = user.country ?? 'Dejar campo vacio';
       _phoneController.text = user.phone_number ?? 'No disponible';
+      _incomeBudgetController.text = user.monthlyIncomeBudget?.toString() ?? '';
+      _expenseBudgetController.text = user.monthlyExpenseBudget?.toString() ?? '';
     }
   }
 
@@ -59,6 +64,8 @@ class _ProfilePageState extends State<ProfilePage> {
         birthdate: DateTime.tryParse(_birthdateController.text) ?? DateTime.now(),
         country: _countryController.text,
         phone_number: _phoneController.text,
+        monthlyIncomeBudget: double.tryParse(_incomeBudgetController.text),
+        monthlyExpenseBudget: double.tryParse(_expenseBudgetController.text),
       );
 
       try {
@@ -72,8 +79,7 @@ class _ProfilePageState extends State<ProfilePage> {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error al actualizar el perfil: $e')));
       }
     }
-}
-
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -91,84 +97,119 @@ class _ProfilePageState extends State<ProfilePage> {
               radius: 50,
               child: Icon(Icons.person, size: 50),
             ),
-            Center( // Centra el texto del correo electrónico
+            Center(
               child: Text(
                 userController.usuario!.email,
-                style: TextStyle(fontSize: 16), // Puedes ajustar el tamaño del texto si lo deseas
+                style: TextStyle(fontSize: 16),
               ),
             ),
-            SizedBox(height: 20),
-            // Nombre
+            SizedBox(height: 12),
             Material(
-              elevation: 4.0, // Adjust as needed
+              elevation: 4.0,
               borderRadius: BorderRadius.circular(10.0),
-              color: const Color.fromARGB(217, 217, 217, 217), // Background color of the box
+              color: const Color.fromARGB(217, 217, 217, 217),
               child: TextFormField(
                 controller: _nameController,
                 decoration: InputDecoration(
                   prefixIcon: Icon(Icons.person),
                   labelText: 'Nombre',
                   labelStyle: TextStyle(color: const Color.fromARGB(255, 0, 0, 0)),
-                  border: InputBorder.none, // Remove the default border
+                  border: InputBorder.none,
                   contentPadding: EdgeInsets.all(16.0),
                 ),
               ),
             ),
             SizedBox(height: 16),
-            // Genero
             CustomDropdown(
-              controller: _genderController, // Use the same controller
+              controller: _genderController,
               labelText: 'Género',
               icon: Icons.accessibility,
               items: ['Masculino', 'Femenino', 'Otro', 'No disponible'],
             ),
             SizedBox(height: 16),
-            // Fecha de nacimiento
             DatePickerField(
               controller: _birthdateController,
               labelText: 'Fecha de nacimiento',
-              initialDate: userController.usuario?.birthdate, onChanged: (selectedDate) {  },
+              initialDate: userController.usuario?.birthdate,
+              onChanged: (selectedDate) {},
             ),
-
             SizedBox(height: 16),
-
             CustomDropdown(
-              controller: _countryController, // Use the same controller
+              controller: _countryController,
               labelText: 'Nacionalidad',
               icon: Icons.flag,
-              items: ['Dejar campo vacio', 
-                      'Argentina', 
-                      'Brasil', 
-                      'Chile', 
-                      'México', 
-                      'Colombia', 
-                      'Perú', 
-                      'España', 
-                      'Francia', 
-                      'Estados Unidos', 
-                      'Canadá', 
-                      'Alemania', 
-                      'Italia', 
-                      'Reino Unido',
-                      'Australia', 
-                      'India', 
-                      'Japón',
-                      'Venezuela'
-                    ],
+              items: [
+                'Dejar campo vacio',
+                'Argentina',
+                'Brasil',
+                'Chile',
+                'México',
+                'Colombia',
+                'Perú',
+                'España',
+                'Francia',
+                'Estados Unidos',
+                'Canadá',
+                'Alemania',
+                'Italia',
+                'Reino Unido',
+                'Australia',
+                'India',
+                'Japón',
+                'Venezuela'
+              ],
             ),
             SizedBox(height: 16),
-            //Telefono
             CustomPhoneField(
               controller: _phoneController,
               labelText: 'Número de teléfono',
               hintText: 'Ejemplo: 4241305112',
             ),
-            SizedBox(height: 32),
-            CustomButton(
-                onPressed: _updateProfile,
-                text: 'Actualizar Perfil',
+            SizedBox(height: 16),
+            Material(
+              elevation: 4.0,
+              borderRadius: BorderRadius.circular(10.0),
+              color: const Color.fromARGB(217, 217, 217, 217),
+              child: TextFormField(
+                controller: _incomeBudgetController,
+                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')), // Permitir solo números, punto y coma
+                ],
+                decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.arrow_upward),
+                  labelText: 'Presupuesto de Ingreso Mensual',
+                  labelStyle: TextStyle(color: const Color.fromARGB(255, 0, 0, 0)),
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.all(16.0),
+                ),
               ),
-            
+            ),
+            SizedBox(height: 16),
+            Material(
+              elevation: 4.0,
+              borderRadius: BorderRadius.circular(10.0),
+              color: const Color.fromARGB(217, 217, 217, 217),
+              child: TextFormField(
+                controller: _expenseBudgetController,
+                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')), // Permitir solo números, punto y coma
+                ],
+                decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.arrow_downward),
+                  labelText: 'Presupuesto de Gasto Mensual',
+                  labelStyle: TextStyle(color: const Color.fromARGB(255, 0, 0, 0)),
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.all(16.0),
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
+            CustomButton(
+              onPressed: _updateProfile,
+              text: 'Actualizar Perfil',
+            ),
           ],
         ),
       ),

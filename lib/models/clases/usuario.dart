@@ -8,6 +8,8 @@ class Usuario {
   final DateTime? birthdate;
   final String? country;
   final String? phone_number;
+  final double? monthlyIncomeBudget; // Presupuesto de ingreso mensual
+  final double? monthlyExpenseBudget; // Presupuesto de gasto mensual
 
   const Usuario({
     required this.id,
@@ -17,6 +19,8 @@ class Usuario {
     this.birthdate,
     this.country,
     this.phone_number,
+    this.monthlyIncomeBudget,
+    this.monthlyExpenseBudget,
   });
 
   // Método para convertir a Map
@@ -29,6 +33,8 @@ class Usuario {
       'birthdate': birthdate != null ? Timestamp.fromDate(birthdate!) : null,
       'country': country,
       'phone_number': phone_number,
+      'monthlyIncomeBudget': monthlyIncomeBudget,
+      'monthlyExpenseBudget': monthlyExpenseBudget,
     };
   }
 
@@ -42,6 +48,8 @@ class Usuario {
       birthdate: map['birthdate'] != null ? (map['birthdate'] as Timestamp).toDate() : null,
       country: map['country'],
       phone_number: map['phone_number'],
+      monthlyIncomeBudget: map['monthlyIncomeBudget']?.toDouble(), // Convertir a double si existe
+      monthlyExpenseBudget: map['monthlyExpenseBudget']?.toDouble(), // Convertir a double si existe
     );
   }
 }

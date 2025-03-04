@@ -23,36 +23,38 @@ class FirebaseService {
   }
 
   Future<Usuario?> getUserByEmail(String email) async {
-    try {
-      QuerySnapshot querySnapshot = await _firestore
-          .collection('users')
-          .where('email', isEqualTo: email)
-          .limit(1)
-          .get();
+  try {
+    QuerySnapshot querySnapshot = await _firestore
+        .collection('users')
+        .where('email', isEqualTo: email)
+        .limit(1)
+        .get();
 
-      if (querySnapshot.docs.isNotEmpty) {
-        DocumentSnapshot snapshot = querySnapshot.docs.first;
-        Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+    if (querySnapshot.docs.isNotEmpty) {
+      DocumentSnapshot snapshot = querySnapshot.docs.first;
+      Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
 
-        return Usuario(
-          id: snapshot.id,
-          name: data['name'],
-          email: data['email'],
-          gender: data['gender'],
-          birthdate: data['birthdate'] != null
-              ? (data['birthdate'] as Timestamp).toDate()
-              : null,
-          country: data['country'],
-          phone_number: data['phone_number'],
-        );
-      } else {
-        return null;
-      }
-    } catch (e) {
-      print('Error al buscar usuario por email: $e');
-      rethrow;
+      return Usuario(
+        id: snapshot.id,
+        name: data['name'],
+        email: data['email'],
+        gender: data['gender'],
+        birthdate: data['birthdate'] != null
+            ? (data['birthdate'] as Timestamp).toDate()
+            : null,
+        country: data['country'],
+        phone_number: data['phone_number'],
+        monthlyIncomeBudget: data['monthlyIncomeBudget']?.toDouble(), // Obtener el presupuesto de ingreso mensual
+        monthlyExpenseBudget: data['monthlyExpenseBudget']?.toDouble(), // Obtener el presupuesto de gasto mensual
+      );
+    } else {
+      return null;
     }
+  } catch (e) {
+    print('Error al buscar usuario por email: $e');
+    rethrow;
   }
+}
 
   // Método para iniciar sesión
   Future<User?> signInWithEmailPassword(String email, String password) async {
