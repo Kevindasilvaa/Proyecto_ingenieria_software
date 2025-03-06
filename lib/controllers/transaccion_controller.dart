@@ -149,7 +149,8 @@ class TransaccionesController {
           .get();
 
       if (cuentaQuerySnapshot.docs.isEmpty) {
-        print('No se encuentra la cuenta con el idCuenta proporcionado.');
+        // Eliminamos la transaccion de firestore sin mas nada que hacer
+        await _firestore.collection('transaction').doc(transaccion.id).delete();
         return;
       }
 
