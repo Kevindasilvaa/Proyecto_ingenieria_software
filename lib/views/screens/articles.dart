@@ -14,8 +14,8 @@ class ArticlesPage extends StatelessWidget {
     final viewportWidth = MediaQuery.of(context).size.width;
 
     // Definimos las dimensiones deseadas para cada tarjeta en teléfonos:
-    final double phoneCardHeight = viewportHeight * 0.70;
-    final double phoneCardWidth = viewportWidth * 0.60;
+    final double phoneCardHeight = viewportHeight * 0.47;
+    final double phoneCardWidth = viewportWidth * 0.64;
 
     // Determinamos si estamos en teléfono (ancho menor a 600)
     final bool isPhone = viewportWidth < 600;
