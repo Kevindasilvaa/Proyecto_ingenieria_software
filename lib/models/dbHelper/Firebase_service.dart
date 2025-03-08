@@ -4,6 +4,8 @@ import 'package:moni/models/clases/Usuario.dart'; // Importa la clase User
 import 'package:moni/models/clases/cuenta.dart';
 import 'dart:math';
 
+import 'package:moni/models/clases/income_offers.dart';
+
 class FirebaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
@@ -202,4 +204,94 @@ class FirebaseService {
       throw e;
     }
   }
+  
+  // OBTENER TODAS LAS OFERTAS DE INGRESO
+  Future<List<IncomeOffers>> obtenerTodasIncomeOffers() async {
+    try {
+      QuerySnapshot snapshot =
+          await _firestore.collection('income_offers').get();
+
+      return snapshot.docs
+          .map((doc) =>
+              IncomeOffers.fromMap(doc.data() as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      print('Error al obtener todas las ofertas de ingreso: $e');
+      rethrow;
+    }
+  }
+
+ // OBTENER LAS OFERTAS DE INGRESO DE UN USUARIO
+  Future<List<IncomeOffers>> obtenerIncomeOffersPorUsuario(String userEmail) async {
+    try {
+      QuerySnapshot snapshot = await _firestore
+          .collection('income_offers')
+          .where('email', isEqualTo: userEmail)
+          .get();
+
+      return snapshot.docs
+          .map((doc) =>
+              IncomeOffers.fromMap(doc.data() as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      print('Error al obtener ofertas de ingreso: $e');
+      rethrow;
+    }
+  }
+
+  // AGREGAR UNA OFERTA DE INGRESO A FIRESTORE
+  Future<void> agregarIncomeOffer(IncomeOffers incomeOffer) async {
+    try {
+      await _firestore.collection('income_offers').add(incomeOffer.toMap());
+    } catch (e) {
+      print('Error al agregar oferta de ingreso: $e');
+      rethrow;
+    }
+  }
+
+  // MODIFICAR UNA OFERTA DE INGRESO EN FIRESTORE
+  Future<void> modificarIncomeOffer(IncomeOffers incomeOffer) async {
+    try {
+      QuerySnapshot querySnapshot = await _firestore
+          .collection('income_offers')
+          .where('id_oferta_de_trabajo',
+              isEqualTo: incomeOffer.idOfertaDeTrabajo)
+          .get();
+
+      if (querySnapshot.docs.isEmpty) {
+        print(
+            'No se encontró ninguna oferta de ingreso con id: ${incomeOffer.idOfertaDeTrabajo}');
+        return;
+      }
+
+      await querySnapshot.docs.first.reference.update(incomeOffer.toMap());
+      print(
+          'Oferta de ingreso modificada en Firestore: ${incomeOffer.idOfertaDeTrabajo}');
+    } catch (e) {
+      print('Error al modificar oferta de ingreso en Firestore: $e');
+      rethrow;
+    }
+  }
+
+  // ELIMINAR UNA OFERTA DE INGRESO DE FIRESTORE
+  Future<void> eliminarIncomeOffer(String idOferta) async {
+    try {
+      QuerySnapshot querySnapshot = await _firestore
+          .collection('income_offers')
+          .where('id_oferta_de_trabajo', isEqualTo: idOferta)
+          .get();
+
+      if (querySnapshot.docs.isEmpty) {
+        print('No se encontró ninguna oferta de ingreso con id: $idOferta');
+        return;
+      }
+
+      await querySnapshot.docs.first.reference.delete();
+      print('Oferta de ingreso eliminada exitosamente');
+    } catch (e) {
+      print('Error al eliminar oferta de ingreso: $e');
+      rethrow;
+    }
+  }
+
 }

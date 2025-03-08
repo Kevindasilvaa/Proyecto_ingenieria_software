@@ -16,8 +16,9 @@ class _CustomDrawerState extends State<CustomDrawer> {
   Color statisticsIconColor = Colors.grey[600]!;
   Color accountsIconColor = Colors.grey[600]!;
   Color categoriesIconColor = Colors.grey[600]!;
-  Color articlesIconColor = Colors.grey[600]!; // Nuevo color para Artículos
+  Color articlesIconColor = Colors.grey[600]!;
   Color offers_incomeIconColor = Colors.grey[600]!;
+  Color my_offers_incomeIconColor = Colors.grey[600]!;
   Color transactionsIconColor = Colors.grey[600]!;
 
   @override
@@ -204,23 +205,24 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 },
               ),
             ),
-            // Opción Configuración
+            // Opción de mis Ofertas de Ingresos
             MouseRegion(
               onEnter: (_) {
                 setState(() {
-                  settingsIconColor = Colors.grey[900]!;
+                  my_offers_incomeIconColor = Colors.grey[900]!;
                 });
               },
               onExit: (_) {
                 setState(() {
-                  settingsIconColor = Colors.grey[600]!;
+                  my_offers_incomeIconColor = Colors.grey[600]!;
                 });
               },
               child: ListTile(
-                leading: Icon(Icons.settings, color: settingsIconColor),
-                title: Text('Configuración'),
+                leading:
+                    Icon(Icons.person_pin_circle, color: my_offers_incomeIconColor),
+                title: Text('Mis Ofertas de Ingresos'),
                 onTap: () {
-                  Navigator.pushNamed(context, '/settings');
+                  Navigator.pushNamed(context, '/my_income_offers');
                 },
               ),
             ),

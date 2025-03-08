@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:moni/controllers/income_offers_controller.dart';
 import 'package:moni/controllers/user_controller.dart';
 import 'package:moni/controllers/category_controller.dart';
 import 'package:moni/controllers/cuenta_controller.dart';
@@ -7,11 +8,11 @@ import 'package:moni/models/dbHelper/firebase_options.dart';
 import 'package:moni/views/screens/accounts.dart';
 import 'package:moni/views/screens/categories.dart';
 import 'package:moni/views/screens/incomeOffers.dart';
+import 'package:moni/views/screens/myIncomeOffers.dart';
 import 'package:moni/views/screens/register.dart';
 import 'package:moni/views/screens/home.dart';
 import 'package:moni/views/screens/login.dart';
 import 'package:moni/views/screens/profile.dart';
-import 'package:moni/views/screens/settings.dart';
 import 'package:moni/views/screens/statistics.dart';
 import 'package:moni/views/screens/transactions.dart';
 import 'package:provider/provider.dart';
@@ -31,6 +32,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => UserController()),
         ChangeNotifierProvider(create: (_) => CategoryController()),
         ChangeNotifierProvider(create: (_) => CuentaController()),
+        ChangeNotifierProvider(create: (_) => IncomeOffersController()),
         // ... otros providers
       ],
       child: MyApp(),
@@ -65,12 +67,12 @@ class MyApp extends StatelessWidget {
         '/': (context) => LoginPage(),
         '/register': (context) => RegisterPage(),
         '/home': (context) => HomePage(),
-        '/settings': (context) => SettingsPage(),
         '/profile': (context) => ProfilePage(),
         '/addTransactions': (context) => AddTransactionsPage(),
         '/transactions': (context) => TransactionsPage(),
         '/statistics': (context) => StatisticsPage(),
         '/income_offers': (context) => IncomeOffersPage(),
+        '/my_income_offers': (context) => MyIncomeOffersPage(),
         '/categories': (context) => CategoriesPage(),
         '/accounts': (context) => AccountsPage(),
         '/addAccounts': (context) => AddAccountPage(),
