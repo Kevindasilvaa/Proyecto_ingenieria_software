@@ -17,7 +17,8 @@ class MyIncomeOffersPage extends StatefulWidget {
 class _MyIncomeOffersPageState extends State<MyIncomeOffersPage> {
   List<IncomeOffers> _incomeOffers = [];
   StreamSubscription? _incomeOffersSubscription;
-  final IncomeOffersController _incomeOffersController = IncomeOffersController();
+  final IncomeOffersController _incomeOffersController =
+      IncomeOffersController();
   bool _isLoading = true;
 
   @override
@@ -36,7 +37,7 @@ class _MyIncomeOffersPageState extends State<MyIncomeOffersPage> {
   // Este método asegura que el usuario esté disponible antes de cargar las ofertas
   Future<void> _cargarIncomeOffersInicial() async {
     final userController = Provider.of<UserController>(context, listen: false);
-    
+
     // Si el usuario no está cargado, esperamos hasta que se cargue
     if (userController.usuario == null) {
       setState(() {
@@ -104,46 +105,51 @@ class _MyIncomeOffersPageState extends State<MyIncomeOffersPage> {
       body: Column(
         children: [
           // Barra de carga en la parte superior mientras esperamos al usuario
-          if (_isLoading)
-            LinearProgressIndicator(),
+          if (_isLoading) LinearProgressIndicator(),
           Expanded(
             child: _isLoading
-                ? Center(child: CircularProgressIndicator()) // Indicador en el centro mientras carga
+                ? Center(
+                    child:
+                        CircularProgressIndicator()) // Indicador en el centro mientras carga
                 : Column(
                     children: [
                       Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        child:
-                      ElevatedButton(
-                        onPressed: () async {
-                                    if (userEmail != null) {
-                                      await Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => AddIncomeOfferPage()),
-                                      );
-                                      await _cargarIncomeOffersInicial(); // Esperamos a que se recarguen las ofertas
-                                      _iniciarStream();
-                                    } else {
-                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                        content: Text('Inicia sesión para agregar ofertas'),
-                                        duration: Duration(seconds: 2),
-                                      ));
-                                    }
-                                  },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.grey[300],
-                          foregroundColor: Colors.black,
-                          padding: EdgeInsets.symmetric(vertical: 14, horizontal: 32),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            if (userEmail != null) {
+                              await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => AddIncomeOfferPage()),
+                              );
+                              await _cargarIncomeOffersInicial(); // Esperamos a que se recarguen las ofertas
+                              _iniciarStream();
+                            } else {
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(SnackBar(
+                                content:
+                                    Text('Inicia sesión para agregar ofertas'),
+                                duration: Duration(seconds: 2),
+                              ));
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.grey[300],
+                            foregroundColor: Colors.black,
+                            padding: EdgeInsets.symmetric(
+                                vertical: 14, horizontal: 32),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          child: Text(
+                            'Publicar Oferta de Ingreso',
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
                           ),
                         ),
-                        child: Text(
-                          'Publicar Oferta de Ingreso',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                      ),
                       ),
                       Expanded(
                         child: userEmail != null
@@ -214,7 +220,8 @@ class _MyIncomeOffersPageState extends State<MyIncomeOffersPage> {
 
   void _confirmarEliminacion(IncomeOffers incomeOffer) {
     final userController = Provider.of<UserController>(context, listen: false);
-    final offersController = Provider.of<IncomeOffersController>(context, listen: false);
+    final offersController =
+        Provider.of<IncomeOffersController>(context, listen: false);
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -233,12 +240,15 @@ class _MyIncomeOffersPageState extends State<MyIncomeOffersPage> {
               child: Text("Eliminar"),
               onPressed: () async {
                 await offersController
-                    .eliminarIncomeOffer(incomeOffer.idOfertaDeTrabajo, incomeOffer.email)
+                    .eliminarIncomeOffer(
+                        incomeOffer.idOfertaDeTrabajo, incomeOffer.email)
                     .then((_) async {
                   Navigator.of(context).pop(); // Cerrar el diálogo
                   _cargarIncomeOffersInicial(); // recargar las ofertas
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Oferta de ingreso eliminada exitosamente')),
+                    SnackBar(
+                        content:
+                            Text('Oferta de ingreso eliminada exitosamente')),
                   );
                 }).catchError((error) {
                   ScaffoldMessenger.of(context).showSnackBar(
