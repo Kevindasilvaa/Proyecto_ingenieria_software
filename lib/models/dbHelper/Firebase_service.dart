@@ -25,38 +25,40 @@ class FirebaseService {
   }
 
   Future<Usuario?> getUserByEmail(String email) async {
-  try {
-    QuerySnapshot querySnapshot = await _firestore
-        .collection('users')
-        .where('email', isEqualTo: email)
-        .limit(1)
-        .get();
+    try {
+      QuerySnapshot querySnapshot = await _firestore
+          .collection('users')
+          .where('email', isEqualTo: email)
+          .limit(1)
+          .get();
 
-    if (querySnapshot.docs.isNotEmpty) {
-      DocumentSnapshot snapshot = querySnapshot.docs.first;
-      Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot snapshot = querySnapshot.docs.first;
+        Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
 
-      return Usuario(
-        id: snapshot.id,
-        name: data['name'],
-        email: data['email'],
-        gender: data['gender'],
-        birthdate: data['birthdate'] != null
-            ? (data['birthdate'] as Timestamp).toDate()
-            : null,
-        country: data['country'],
-        phone_number: data['phone_number'],
-        monthlyIncomeBudget: data['monthlyIncomeBudget']?.toDouble(), // Obtener el presupuesto de ingreso mensual
-        monthlyExpenseBudget: data['monthlyExpenseBudget']?.toDouble(), // Obtener el presupuesto de gasto mensual
-      );
-    } else {
-      return null;
+        return Usuario(
+          id: snapshot.id,
+          name: data['name'],
+          email: data['email'],
+          gender: data['gender'],
+          birthdate: data['birthdate'] != null
+              ? (data['birthdate'] as Timestamp).toDate()
+              : null,
+          country: data['country'],
+          phone_number: data['phone_number'],
+          monthlyIncomeBudget: data['monthlyIncomeBudget']
+              ?.toDouble(), // Obtener el presupuesto de ingreso mensual
+          monthlyExpenseBudget: data['monthlyExpenseBudget']
+              ?.toDouble(), // Obtener el presupuesto de gasto mensual
+        );
+      } else {
+        return null;
+      }
+    } catch (e) {
+      print('Error al buscar usuario por email: $e');
+      rethrow;
     }
-  } catch (e) {
-    print('Error al buscar usuario por email: $e');
-    rethrow;
   }
-}
 
   // Método para iniciar sesión
   Future<User?> signInWithEmailPassword(String email, String password) async {
@@ -204,25 +206,26 @@ class FirebaseService {
       throw e;
     }
   }
-  
+
   // OBTENER TODAS LAS OFERTAS DE INGRESO
   Future<List<IncomeOffers>> obtenerTodasIncomeOffers() async {
     try {
       QuerySnapshot snapshot =
           await _firestore.collection('income_offers').get();
-
+      print('Documentos encontrados: ${snapshot.docs.length}');
       return snapshot.docs
-          .map((doc) =>
-              IncomeOffers.fromMap(doc.data() as Map<String, dynamic>))
+          .map(
+              (doc) => IncomeOffers.fromMap(doc.data() as Map<String, dynamic>))
           .toList();
     } catch (e) {
       print('Error al obtener todas las ofertas de ingreso: $e');
-      rethrow;
+      throw e;
     }
   }
 
- // OBTENER LAS OFERTAS DE INGRESO DE UN USUARIO
-  Future<List<IncomeOffers>> obtenerIncomeOffersPorUsuario(String userEmail) async {
+  // OBTENER LAS OFERTAS DE INGRESO DE UN USUARIO
+  Future<List<IncomeOffers>> obtenerIncomeOffersPorUsuario(
+      String userEmail) async {
     try {
       QuerySnapshot snapshot = await _firestore
           .collection('income_offers')
@@ -230,8 +233,8 @@ class FirebaseService {
           .get();
 
       return snapshot.docs
-          .map((doc) =>
-              IncomeOffers.fromMap(doc.data() as Map<String, dynamic>))
+          .map(
+              (doc) => IncomeOffers.fromMap(doc.data() as Map<String, dynamic>))
           .toList();
     } catch (e) {
       print('Error al obtener ofertas de ingreso: $e');
@@ -293,5 +296,4 @@ class FirebaseService {
       rethrow;
     }
   }
-
 }
