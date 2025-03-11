@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:math';
 
 class IncomeOffers {
@@ -45,6 +46,11 @@ class IncomeOffers {
       phoneNumber: map['phone_number'],
       tipoMoneda: map['tipoMoneda'] ?? 'USD',
     );
+  }
+
+  factory IncomeOffers.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    return IncomeOffers.fromMap(data);
   }
 
   static String _generarIdOfertaDeTrabajo() {
