@@ -172,16 +172,16 @@ Widget _buildIncomeOfferContainer(IncomeOffers incomeOffer) {
     margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
     padding: EdgeInsets.all(16),
     decoration: BoxDecoration(
-      color: Colors.grey[100],
+      color:const Color(0xFFF9F9F9),
       borderRadius: BorderRadius.circular(20),
       boxShadow: [
-        BoxShadow(
-          color: Colors.blueGrey.withOpacity(0.2),
-          spreadRadius: 2,
-          blurRadius: 6,
-          offset: Offset(0, 3),
-        ),
-      ],
+          BoxShadow(
+            color: const Color.fromARGB(255, 124, 124, 124).withOpacity(0.5),
+            spreadRadius: 2,
+            blurRadius: 5,
+            offset: const Offset(0, 3), // Sombra con desplazamiento
+          ),
+        ],
     ),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
