@@ -48,6 +48,7 @@ class _IncomeOffersPageState extends State<IncomeOffersPage> {
         backgroundColor: Colors.grey[200],
         title: Text('Ofertas de Ingreso Disponibles'),
       ),
+      drawer: CustomDrawer(),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
           : _incomeOffers.isEmpty
