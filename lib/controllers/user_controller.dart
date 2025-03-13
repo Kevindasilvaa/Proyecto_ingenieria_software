@@ -5,7 +5,8 @@ import 'package:moni/models/dbHelper/firebase_service.dart';
 import 'package:moni/models/clases/Usuario.dart';
 import 'package:flutter/material.dart';
 
-class UserController with ChangeNotifier {  // Cambié esto a "with ChangeNotifier"
+class UserController with ChangeNotifier {
+  // Cambié esto a "with ChangeNotifier"
   final FirebaseService _firebaseService = FirebaseService();
 
   // Aquí se guarda el usuario actual
@@ -18,8 +19,8 @@ class UserController with ChangeNotifier {  // Cambié esto a "with ChangeNotifi
 
   // Escuchar cambios en el estado de autenticación y actualizar la variable usuario
   void startAuthListener(BuildContext context) {
-    if (_isListening) return;  // No registrar el listener si ya está registrado
-    _isListening = true;  // Marcar que el listener está activo
+    if (_isListening) return; // No registrar el listener si ya está registrado
+    _isListening = true; // Marcar que el listener está activo
 
     final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
@@ -32,7 +33,8 @@ class UserController with ChangeNotifier {  // Cambié esto a "with ChangeNotifi
       } else {
         // El usuario ha iniciado sesión
         print("El usuario inició sesión");
-        final user = await getUserByEmail(firebaseUser.email!); // Traer datos adicionales del usuario
+        final user = await getUserByEmail(
+            firebaseUser.email!); // Traer datos adicionales del usuario
         _usuario = user;
       }
 
@@ -44,19 +46,20 @@ class UserController with ChangeNotifier {  // Cambié esto a "with ChangeNotifi
   // Setter para actualizar el usuario
   set usuario(Usuario? nuevoUsuario) {
     _usuario = nuevoUsuario;
-    notifyListeners();  // Notifica a los listeners (ejemplo: UI) que el usuario ha cambiado
+    notifyListeners(); // Notifica a los listeners (ejemplo: UI) que el usuario ha cambiado
   }
 
   // Crea un usuario en FirebaseAuthentification y lo almacena en Firestore, siempre y cuando las credenciales sean validas
   Future<Usuario?> createUser(String email, String password) async {
     try {
-      Usuario? user = await _firebaseService.createUserAuthentification(email, password);
-      if(user != null){
+      Usuario? user =
+          await _firebaseService.createUserAuthentification(email, password);
+      if (user != null) {
         await _firebaseService.saveUserInFirestore(user);
         _usuario = user;
-        notifyListeners();  // Notifica que el usuario ha iniciado sesion
+        notifyListeners(); // Notifica que el usuario ha iniciado sesion
         return user;
-      }else{
+      } else {
         return null;
       }
     } catch (e) {
@@ -70,7 +73,7 @@ class UserController with ChangeNotifier {  // Cambié esto a "with ChangeNotifi
     try {
       // Llamar al método del servicio de firebase para obtener el usuario
       Usuario? user = await _firebaseService.getUserByEmail(email);
-      return user;  // Retornar el usuario encontrado
+      return user; // Retornar el usuario encontrado
     } catch (e) {
       print('Error en UserController al obtener usuario por email: $e');
       rethrow;
@@ -81,13 +84,15 @@ class UserController with ChangeNotifier {  // Cambié esto a "with ChangeNotifi
   Future<void> signIn(String email, String password) async {
     try {
       // Usar el servicio para autenticar con Firebase
-      User? firebaseUser = await _firebaseService.signInWithEmailPassword(email, password);
+      User? firebaseUser =
+          await _firebaseService.signInWithEmailPassword(email, password);
 
       if (firebaseUser != null) {
         // Aquí creas el usuario para tu aplicación a partir de los datos de Firebase
-        final user = await getUserByEmail(firebaseUser.email!); // Traer datos adicionales del usuario
+        final user = await getUserByEmail(
+            firebaseUser.email!); // Traer datos adicionales del usuario
         _usuario = user;
-        notifyListeners();  // Notifica que el usuario ha sido actualizado
+        notifyListeners(); // Notifica que el usuario ha sido actualizado
       }
     } catch (e) {
       print('Error al iniciar sesión: $e');
@@ -100,7 +105,7 @@ class UserController with ChangeNotifier {  // Cambié esto a "with ChangeNotifi
     try {
       await _firebaseService.signOut();
       _usuario = null;
-      notifyListeners();  // Notifica que el usuario ha cerrado sesión
+      notifyListeners(); // Notifica que el usuario ha cerrado sesión
     } catch (e) {
       print('Error al cerrar sesión: $e');
       rethrow;
@@ -119,7 +124,7 @@ class UserController with ChangeNotifier {  // Cambié esto a "with ChangeNotifi
       rethrow; // Re-lanza el error para que se pueda manejar en la UI
     }
   }
-  
+
   // Este metodo funciona tanto para Iniciar sesion como para crear una cuenta
   Future<void> signInWithGoogle() async {
     try {
@@ -127,7 +132,8 @@ class UserController with ChangeNotifier {  // Cambié esto a "with ChangeNotifi
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
       // 2. Obtener las credenciales de autenticación de Google
-      final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
+      final GoogleSignInAuthentication? googleAuth =
+          await googleUser?.authentication;
 
       // 3. Crear una credencial de Firebase con las credenciales de Google
       final credential = GoogleAuthProvider.credential(
@@ -137,7 +143,8 @@ class UserController with ChangeNotifier {  // Cambié esto a "with ChangeNotifi
 
       // 4. Autenticarse con Firebase usando la credencial
       final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-      UserCredential userCredential = await _firebaseAuth.signInWithCredential(credential);
+      UserCredential userCredential =
+          await _firebaseAuth.signInWithCredential(credential);
 
       // 5. Obtener el usuario de Firebase
       User? firebaseUser = userCredential.user;
@@ -174,5 +181,26 @@ class UserController with ChangeNotifier {  // Cambié esto a "with ChangeNotifi
       print('Error al iniciar sesión con Google: $e');
       rethrow; // Re-lanza el error para que se pueda manejar en la UI
     }
+  }
+
+  Future<void> updateMonthlyExpenseBudget(double newBudget) async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(usuario!.id)
+        .update({'monthlyExpenseBudget': newBudget});
+
+    // Creamos una nueva instancia del usuario con el presupuesto actualizado
+    usuario = Usuario(
+      id: usuario!.id,
+      email: usuario!.email,
+      name: usuario!.name,
+      gender: usuario!.gender,
+      birthdate: usuario!.birthdate,
+      country: usuario!.country,
+      phone_number: usuario!.phone_number,
+      monthlyIncomeBudget: usuario!.monthlyIncomeBudget,
+      monthlyExpenseBudget: newBudget,
+    );
+    notifyListeners();
   }
 }

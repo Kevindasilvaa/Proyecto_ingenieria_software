@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:moni/controllers/user_controller.dart';
 import 'package:moni/models/clases/Usuario.dart';
 import 'package:moni/views/widgets/CustomButton.dart';
+import 'package:moni/views/widgets/CustomDrawer.dart';
 import 'package:moni/views/widgets/CustomDropdown.dart';
 import 'package:moni/views/widgets/CustomTextField.dart';
 import 'package:moni/views/widgets/CustomePhoneField.dart';
@@ -86,9 +87,14 @@ class _ProfilePageState extends State<ProfilePage> {
     final userController = Provider.of<UserController>(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text('Perfil'),
+        backgroundColor: Color(0xFFCECECE),
+        title: Text(
+          'Perfil',
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
       ),
+      drawer: CustomDrawer(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ListView(
