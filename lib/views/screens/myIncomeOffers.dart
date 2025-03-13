@@ -15,6 +15,7 @@ class MyIncomeOffersPage extends StatefulWidget {
 
 class _MyIncomeOffersPageState extends State<MyIncomeOffersPage> {
   List<IncomeOffers> _incomeOffers = [];
+  List<IncomeOffers> _savedIncomeOffers = [];
   StreamSubscription? _incomeOffersSubscription;
   final IncomeOffersController _incomeOffersController = IncomeOffersController();
   bool _isLoading = true;
@@ -24,6 +25,7 @@ class _MyIncomeOffersPageState extends State<MyIncomeOffersPage> {
     super.initState();
     _cargarIncomeOffersInicial();
     _iniciarStream();
+    _cargarOfertasGuardadas();
   }
 
   @override
@@ -61,6 +63,25 @@ class _MyIncomeOffersPageState extends State<MyIncomeOffersPage> {
     } else {
       setState(() {
         _isLoading = false;
+      });
+    }
+  }
+
+    Future<void> _cargarOfertasGuardadas() async {
+    final userController = Provider.of<UserController>(context, listen: false);
+    print(userController.usuario!.saved_offers);
+    if (userController.usuario != null && userController.usuario!.saved_offers != null) {
+      List<IncomeOffers> savedOffers = [];
+      for (String offerId in userController.usuario!.saved_offers!) {
+        IncomeOffers? offer = await _incomeOffersController.getIncomeOfferById(offerId);
+        print(offer);
+        if (offer != null) {
+          savedOffers.add(offer);
+          print(offer);
+        }
+      }
+      setState(() {
+        _savedIncomeOffers = savedOffers;
       });
     }
   }
@@ -139,11 +160,38 @@ class _MyIncomeOffersPageState extends State<MyIncomeOffersPage> {
                         ),
                       ),
                       ),
-                      Expanded(
+                      SizedBox(height: 10),
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: Text(
+                          '  Mis publicaciones',
+                          style: TextStyle(
+                            fontSize: 21,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                      Container(
                         child: userEmail != null
-                            ? _buildIncomeOfferList(_incomeOffers)
+                            ? _buildIncomeOfferList(_incomeOffers, false)
                             : Center(
                                 child: Text('Inicia sesión para ver tus ofertas de ingreso')),
+                      ),
+                      SizedBox(height: 10),
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: Text(
+                          '  Ofertas Guardadas',
+                          style: TextStyle(
+                            fontSize: 21,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        child: _buildIncomeOfferList(_savedIncomeOffers, true),
                       ),
                     ],
                   ),
@@ -153,21 +201,30 @@ class _MyIncomeOffersPageState extends State<MyIncomeOffersPage> {
     );
   }
 
-  Widget _buildIncomeOfferList(List<IncomeOffers> incomeOffers) {
-    if (incomeOffers.isEmpty) {
-      return Center(child: Text('No hay ofertas de ingreso registradas.'));
-    }
-    return ListView.builder(
-      itemCount: incomeOffers.length,
-      itemBuilder: (context, index) {
-        final incomeOffer = incomeOffers[index];
-        return _buildIncomeOfferContainer(incomeOffer);
-      },
-    );
+Widget _buildIncomeOfferList(List<IncomeOffers> incomeOffers, bool isSaved) {
+  
+  if (incomeOffers.isEmpty) {
+    return Center(child: Text('No hay ofertas de ingreso registradas.'));
   }
+  return SingleChildScrollView(
+    scrollDirection: Axis.horizontal,
+    
+    child: Row(
+       crossAxisAlignment: CrossAxisAlignment.start, // Alinea al inicio verticalmente
+     // mainAxisAlignment: MainAxisAlignment.start, 
+      children: incomeOffers.map((incomeOffer) {
+        return Container(
+          width: 360,
+          height: 245,
+          child: _buildIncomeOfferContainer(incomeOffer, isSaved),
+        );
+      }).toList(),
+    ),
+  );
+}
 
  
-Widget _buildIncomeOfferContainer(IncomeOffers incomeOffer) {
+Widget _buildIncomeOfferContainer(IncomeOffers incomeOffer, bool isSaved) {
   return Container(
     margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
     padding: EdgeInsets.all(16),
@@ -189,21 +246,20 @@ Widget _buildIncomeOfferContainer(IncomeOffers incomeOffer) {
         // Fila con el título pegado a la izquierda y los iconos pegados a la derecha
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            // Título pegado a la izquierda
+           children: [
             Text(
               incomeOffer.titulo,
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black87),
             ),
-            // Iconos pegados a la derecha
-            Row(
-              children: [
-                IconButton(
-                  icon: Icon(Icons.delete, color: Colors.red, size: 30),
-                  onPressed: () => _confirmarEliminacion(incomeOffer),
-                ),
-              ],
-            ),
+            if (!isSaved) // Conditionally render the delete icon
+              Row(
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.delete, color: Colors.red, size: 30),
+                    onPressed: () => _confirmarEliminacion(incomeOffer),
+                  ),
+                ],
+              ),
           ],
         ),
         //SizedBox(height: 2),
@@ -215,7 +271,7 @@ Widget _buildIncomeOfferContainer(IncomeOffers incomeOffer) {
           ),
           children: [
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(1.0),
               child: Text(
                 incomeOffer.descripcion,
                 style: TextStyle(color: Colors.grey[600]),

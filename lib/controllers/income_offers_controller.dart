@@ -6,6 +6,9 @@ import 'package:moni/models/clases/income_offers.dart';
 class IncomeOffersController with ChangeNotifier {
   final FirebaseService _firebaseService = FirebaseService();
   List<IncomeOffers> _incomeOffers = [];
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  IncomeOffers? _savedIncomeOffers;
+
 
   List<IncomeOffers> get incomeOffers => _incomeOffers;
 
@@ -52,4 +55,29 @@ class IncomeOffersController with ChangeNotifier {
       print('Error al cargar todas las ofertas: $e');
     }
   }
+
+
+
+
+Future<IncomeOffers?> getIncomeOfferById(String id) async {
+  try {
+    final snapshot = await _firestore
+        .collection('income_offers')
+        .where('id_oferta_de_trabajo', isEqualTo: id)
+        .get();
+
+    if (snapshot.docs.isNotEmpty) {
+      return IncomeOffers.fromMap(snapshot.docs.first.data() as Map<String, dynamic>);
+    } else {
+      return null; // Return null if no matching document is found
+    }
+  } catch (e) {
+    print('Error getting IncomeOffer: $e');
+    return null; 
+  }
+}
+
+
+
+
 }
