@@ -215,7 +215,7 @@ Widget _buildIncomeOfferList(List<IncomeOffers> incomeOffers, bool isSaved) {
       children: incomeOffers.map((incomeOffer) {
         return Container(
           width: 360,
-          height: 245,
+          //height: 245,
           child: _buildIncomeOfferContainer(incomeOffer, isSaved),
         );
       }).toList(),
@@ -277,6 +277,12 @@ Widget _buildIncomeOfferContainer(IncomeOffers incomeOffer, bool isSaved) {
                 style: TextStyle(color: Colors.grey[600]),
               ),
             ),
+            SizedBox(height: 1),
+            Text(
+              'Contacto: ${incomeOffer.email}', 
+              style: TextStyle(color: const Color.fromARGB(255, 93, 93, 93)),
+            ),
+            SizedBox(height: 2),
           ],
         ),
         SizedBox(height: 4),
