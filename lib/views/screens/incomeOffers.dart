@@ -1,11 +1,10 @@
 import 'package:moni/views/widgets/CustomDrawer.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:moni/controllers/income_offers_controller.dart';
 import 'package:moni/models/clases/income_offers.dart';
 import 'package:moni/controllers/user_controller.dart';
 import 'package:provider/provider.dart';
-import 'package:moni/models/clases/Usuario.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class IncomeOffersPage extends StatefulWidget {
   @override
@@ -14,8 +13,7 @@ class IncomeOffersPage extends StatefulWidget {
 
 class _IncomeOffersPageState extends State<IncomeOffersPage> {
   List<IncomeOffers> _incomeOffers = [];
-  final IncomeOffersController _incomeOffersController =
-      IncomeOffersController();
+  final IncomeOffersController _incomeOffersController = IncomeOffersController();
   bool _isLoading = true;
 
   @override
@@ -88,111 +86,109 @@ class _IncomeOffersPageState extends State<IncomeOffersPage> {
         children: [
           Row(
             children: [
-            Expanded(
-              child: Text(
-                incomeOffer.titulo,
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              Expanded(
+                child: Text(
+                  incomeOffer.titulo,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
               ),
-            ),
-            FutureBuilder<bool>(
-              future: _isOfferSaved(context, incomeOffer.idOfertaDeTrabajo),
-              builder: (context, snapshot) {
-                bool isSaved = snapshot.data ?? false;
-                return IconButton(
-                  icon: Icon(
-                    isSaved ? Icons.bookmark : Icons.bookmark_border,
-                  ),
-                  onPressed: () async {
-                    if (isSaved) {
-                      await _removeOfferFromSaved(context, incomeOffer.idOfertaDeTrabajo);
-                    } else {
-                      await _addOfferToSaved(context, incomeOffer.idOfertaDeTrabajo);
-                    }
-                    setState(() {}); // Actualiza el estado del widget
-                  },
-                );
-              },
-            ),
-          ],
+              StreamBuilder<DocumentSnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(Provider.of<UserController>(context, listen: false).usuario?.id)
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData && snapshot.data!.exists) {
+                    final userData = snapshot.data!.data() as Map<String, dynamic>;
+                    final savedOffers = List<dynamic>.from(userData['saved_offers'] ?? []);
+                    final isSaved = savedOffers.contains(incomeOffer.idOfertaDeTrabajo);
+                    return IconButton(
+                      icon: Icon(
+                        isSaved ? Icons.bookmark : Icons.bookmark_border,
+                      ),
+                      onPressed: () async {
+                        if (isSaved) {
+                          await _removeOfferFromSaved(context, incomeOffer.idOfertaDeTrabajo);
+                        } else {
+                          await _addOfferToSaved(context, incomeOffer.idOfertaDeTrabajo);
+                        }
+                      },
+                    );
+                  } else {
+                    return IconButton(
+                      icon: Icon(Icons.bookmark_border),
+                      onPressed: () async {
+                        await _addOfferToSaved(context, incomeOffer.idOfertaDeTrabajo);
+                      },
+                    );
+                  }
+                },
+              ),
+            ],
           ),
           SizedBox(height: 5),
           Text(incomeOffer.descripcion),
           SizedBox(height: 8),
           Text('Pago: \$${incomeOffer.pago.toStringAsFixed(2)}'),
-          Text(
-              'Contacto: ${incomeOffer.email}'), //OPCIONAL lo podemos quitar
+          Text('Contacto: ${incomeOffer.email}'),
         ],
       ),
     );
   }
-}
 
-
-
-  Future<bool> _isOfferSaved(BuildContext context, String offerId) async {
-  try {
+  Future<void> _addOfferToSaved(BuildContext context, String offerId) async {
     final userController = Provider.of<UserController>(context, listen: false);
-    final user = userController.usuario;
+    final userId = userController.usuario?.id;
 
-    if (user != null) {
-      final List<dynamic> savedOffers = user.saved_offers ?? [];
-      return savedOffers.contains(offerId);
-    }
-    return false;
-  } catch (e) {
-    print('Error checking if offer is saved: $e');
-    return false;
-  }
-}
+    if (userId != null) {
+      try {
+        DocumentSnapshot userSnapshot = await FirebaseFirestore.instance.collection('users').doc(userId).get();
+        if (userSnapshot.exists) {
+          Map<String, dynamic> userData = userSnapshot.data() as Map<String, dynamic>;
+          List<dynamic> savedOffers = List.from(userData['saved_offers'] ?? []);
 
-Future<void> _addOfferToSaved(BuildContext context, String offerId) async {
-    final userController = Provider.of<UserController>(context, listen: false);
-    final user = userController.usuario;
+       
 
-    if (user != null) {
-      List<dynamic> savedOffers = List.from(user.saved_offers ?? []);
-      if (!savedOffers.contains(offerId)) {
-        savedOffers.add(offerId);
-        final updatedUser = Usuario(
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          gender: user.gender,
-          birthdate: user.birthdate,
-          country: user.country,
-          phone_number: user.phone_number,
-          monthlyIncomeBudget: user.monthlyIncomeBudget,
-          monthlyExpenseBudget: user.monthlyExpenseBudget,
-          saved_offers: savedOffers,
-        );
-        await userController.actualizarUsuarioEnFirestore(updatedUser);
-        userController.usuario = updatedUser; // Actualiza el usuario en el provider
+          if (!savedOffers.contains(offerId)) {
+            savedOffers.add(offerId);
+
+            await FirebaseFirestore.instance.collection('users').doc(userId).update({'saved_offers': savedOffers});
+
+            // print('Oferta guardada: $offerId');
+            // print(savedOffers);
+          }
+        }
+      } catch (e) {
+        print('Error al guardar oferta: $e');
       }
     }
   }
 
   Future<void> _removeOfferFromSaved(BuildContext context, String offerId) async {
     final userController = Provider.of<UserController>(context, listen: false);
-    final user = userController.usuario;
+    final userId = userController.usuario?.id;
 
-    if (user != null) {
-      List<dynamic> savedOffers = List.from(user.saved_offers ?? []);
-      if (savedOffers.contains(offerId)) {
-        savedOffers.remove(offerId);
-        final updatedUser = Usuario(
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          gender: user.gender,
-          birthdate: user.birthdate,
-          country: user.country,
-          phone_number: user.phone_number,
-          monthlyIncomeBudget: user.monthlyIncomeBudget,
-          monthlyExpenseBudget: user.monthlyExpenseBudget,
-          saved_offers: savedOffers,
-        );
-        await userController.actualizarUsuarioEnFirestore(updatedUser);
-        userController.usuario = updatedUser; // Actualiza el usuario en el provider
+    if (userId != null) {
+      try {
+        DocumentSnapshot userSnapshot = await FirebaseFirestore.instance.collection('users').doc(userId).get();
+        if (userSnapshot.exists) {
+          Map<String, dynamic> userData = userSnapshot.data() as Map<String, dynamic>;
+          List<dynamic> savedOffers = List.from(userData['saved_offers'] ?? []);
+
+          // print('Lista guardada antes de eliminar: $savedOffers');
+
+          if (savedOffers.contains(offerId)) {
+            savedOffers.remove(offerId);
+
+            await FirebaseFirestore.instance.collection('users').doc(userId).update({'saved_offers': savedOffers});
+
+            // print('Oferta eliminada: $offerId');
+            // print(savedOffers);
+          }
+        }
+      } catch (e) {
+        print('Error al eliminar oferta: $e');
       }
     }
   }
+}
