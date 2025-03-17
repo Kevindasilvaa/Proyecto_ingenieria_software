@@ -6,7 +6,8 @@ import 'package:moni/models/clases/income_offers.dart';
 import 'package:moni/views/widgets/CustomDrawer.dart';
 import 'package:moni/views/widgets/NavBar.dart';
 import 'package:provider/provider.dart';
-import 'package:moni/views/screens/AddIncomeOffer.dart'; // Asegúrate de tener la página de modificación.
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:moni/views/screens/AddIncomeOffer.dart';
 
 class MyIncomeOffersPage extends StatefulWidget {
   @override
@@ -98,8 +99,7 @@ class _MyIncomeOffersPageState extends State<MyIncomeOffersPage> {
       drawer: CustomDrawer(),
       body: Column(
         children: [
-          if (_isLoading)
-            LinearProgressIndicator(),
+          if (_isLoading) LinearProgressIndicator(),
           Expanded(
             child: _isLoading
                 ? Center(child: CircularProgressIndicator())
@@ -126,24 +126,51 @@ class _MyIncomeOffersPageState extends State<MyIncomeOffersPage> {
                             }
                           },
                           style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.grey[300],
-                          foregroundColor: Colors.black,
-                          padding: EdgeInsets.symmetric(vertical: 18, horizontal: 32),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
+                            backgroundColor: Colors.grey[300],
+                            foregroundColor: Colors.black,
+                            padding: EdgeInsets.symmetric(vertical: 18, horizontal: 32),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          child: Text(
+                            'Publicar Oferta de Ingreso',
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                           ),
                         ),
+                      ),
+                      SizedBox(height: 10),
+                      Align(
+                        alignment: Alignment.topLeft,
                         child: Text(
-                          'Publicar Oferta de Ingreso',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          '  Mis publicaciones',
+                          style: TextStyle(
+                            fontSize: 21,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
                         ),
                       ),
-                      ),
-                      Expanded(
+                      Container(
                         child: userEmail != null
-                            ? _buildIncomeOfferList(_incomeOffers)
+                            ? _buildIncomeOfferList(_incomeOffers, false)
                             : Center(
                                 child: Text('Inicia sesión para ver tus ofertas de ingreso')),
+                      ),
+                      SizedBox(height: 10),
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: Text(
+                          '  Ofertas Guardadas',
+                          style: TextStyle(
+                            fontSize: 21,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        child: _buildSavedIncomeOffersStream(),//Llamada a la funcion correcta
                       ),
                     ],
                   ),
@@ -153,21 +180,66 @@ class _MyIncomeOffersPageState extends State<MyIncomeOffersPage> {
     );
   }
 
-  Widget _buildIncomeOfferList(List<IncomeOffers> incomeOffers) {
+  Widget _buildIncomeOfferList(List<IncomeOffers> incomeOffers, bool isSaved) {
     if (incomeOffers.isEmpty) {
       return Center(child: Text('No hay ofertas de ingreso registradas.'));
     }
-    return ListView.builder(
-      itemCount: incomeOffers.length,
-      itemBuilder: (context, index) {
-        final incomeOffer = incomeOffers[index];
-        return _buildIncomeOfferContainer(incomeOffer);
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: incomeOffers.map((incomeOffer) {
+          return Container(
+            width: 360,
+            child: _buildIncomeOfferContainer(incomeOffer, isSaved),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildSavedIncomeOffersStream() {
+    final userController = Provider.of<UserController>(context, listen: false);
+    return StreamBuilder<DocumentSnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('users')
+          .doc(userController.usuario?.id)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData && snapshot.data!.exists) {
+          final userData = snapshot.data!.data() as Map<String, dynamic>;
+          final savedOffersIds = List<String>.from(userData['saved_offers'] ?? []);
+          return FutureBuilder<List<IncomeOffers>>(
+            future: _fetchSavedOffers(savedOffersIds),
+            builder: (context,offersSnapshot) {
+              if (offersSnapshot.hasData) {
+                return _buildIncomeOfferList(offersSnapshot.data!, true);
+              } else if (offersSnapshot.hasError) {
+                return Center(child: Text('Error al cargar ofertas guardadas'));
+              } else {
+                return Center(child: CircularProgressIndicator());
+              }
+            },
+          );
+        } else {
+          return Center(child: Text('No hay ofertas guardadas'));
+        }
       },
     );
   }
 
- 
-Widget _buildIncomeOfferContainer(IncomeOffers incomeOffer) {
+  Future<List<IncomeOffers>> _fetchSavedOffers(List<String> savedOffersIds) async {
+    List<IncomeOffers> savedOffers = [];
+    for (String offerId in savedOffersIds) {
+      IncomeOffers? offer = await _incomeOffersController.getIncomeOfferById(offerId);
+      if (offer != null) {
+        savedOffers.add(offer);
+      }
+    }
+    return savedOffers;
+  }
+  
+Widget _buildIncomeOfferContainer(IncomeOffers incomeOffer, bool isSaved) {
   return Container(
     margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
     padding: EdgeInsets.all(16),
@@ -179,35 +251,31 @@ Widget _buildIncomeOfferContainer(IncomeOffers incomeOffer) {
             color: const Color.fromARGB(255, 124, 124, 124).withOpacity(0.5),
             spreadRadius: 2,
             blurRadius: 5,
-            offset: const Offset(0, 3), // Sombra con desplazamiento
+            offset: const Offset(0, 3), 
           ),
         ],
     ),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Fila con el título pegado a la izquierda y los iconos pegados a la derecha
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // Título pegado a la izquierda
             Text(
               incomeOffer.titulo,
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black87),
             ),
-            // Iconos pegados a la derecha
-            Row(
-              children: [
-                IconButton(
-                  icon: Icon(Icons.delete, color: Colors.red, size: 30),
-                  onPressed: () => _confirmarEliminacion(incomeOffer),
-                ),
-              ],
-            ),
+            if (!isSaved) 
+              Row(
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.delete, color: Colors.red, size: 30),
+                    onPressed: () => _confirmarEliminacion(incomeOffer),
+                  ),
+                ],
+              ),
           ],
         ),
-        //SizedBox(height: 2),
-        // Detalles adicionales
         ExpansionTile(
           title: Text(
             'Más detalles',
@@ -215,23 +283,27 @@ Widget _buildIncomeOfferContainer(IncomeOffers incomeOffer) {
           ),
           children: [
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(1.0),
               child: Text(
                 incomeOffer.descripcion,
                 style: TextStyle(color: Colors.grey[600]),
               ),
             ),
+            SizedBox(height: 1),
+            Text(
+              'Contacto: ${incomeOffer.email}', 
+              style: TextStyle(color: const Color.fromARGB(255, 93, 93, 93)),
+            ),
+            SizedBox(height: 2),
           ],
         ),
         SizedBox(height: 4),
-        // Sección para mostrar el monto y el disponible de forma estilizada
         Row(
           children: [
-            // Monto con icono y estilo visual atractivo
             Container(
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: Colors.blueAccent[50], // Fondo suave azul
+                color: Colors.blueAccent[50], 
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: Colors.blueAccent, width: 2),
               ),
@@ -251,11 +323,10 @@ Widget _buildIncomeOfferContainer(IncomeOffers incomeOffer) {
               ),
             ),
             Spacer(),
-            // Estado con color y formato llamativo
             Container(
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: Colors.green[50], // Fondo suave verde
+                color: Colors.green[50], 
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: Colors.green, width: 2),
               ),
@@ -274,7 +345,6 @@ Widget _buildIncomeOfferContainer(IncomeOffers incomeOffer) {
     ),
   );
 }
-
 
   void _confirmarEliminacion(IncomeOffers incomeOffer) {
     final userController = Provider.of<UserController>(context, listen: false);
@@ -317,5 +387,3 @@ Widget _buildIncomeOfferContainer(IncomeOffers incomeOffer) {
     );
   }
 }
-
-

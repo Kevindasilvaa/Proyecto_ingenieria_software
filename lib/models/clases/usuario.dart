@@ -10,6 +10,7 @@ class Usuario {
   final String? phone_number;
   final double? monthlyIncomeBudget; // Presupuesto de ingreso mensual
   final double? monthlyExpenseBudget; // Presupuesto de gasto mensual
+  final List? saved_offers;
 
   const Usuario({
     required this.id,
@@ -21,6 +22,7 @@ class Usuario {
     this.phone_number,
     this.monthlyIncomeBudget,
     this.monthlyExpenseBudget,
+    this.saved_offers
   });
 
   // Método para convertir a Map
@@ -35,6 +37,7 @@ class Usuario {
       'phone_number': phone_number,
       'monthlyIncomeBudget': monthlyIncomeBudget,
       'monthlyExpenseBudget': monthlyExpenseBudget,
+      'saved_offers': saved_offers
     };
   }
 
@@ -50,6 +53,7 @@ class Usuario {
       phone_number: map['phone_number'],
       monthlyIncomeBudget: map['monthlyIncomeBudget']?.toDouble(), // Convertir a double si existe
       monthlyExpenseBudget: map['monthlyExpenseBudget']?.toDouble(), // Convertir a double si existe
+      saved_offers: map['saved_offers'],
     );
   }
 }

@@ -242,6 +242,28 @@ class FirebaseService {
     }
   }
 
+// Future<IncomeOffers?> getIncomeOffersById(String offerId) async {
+//   try {
+//     QuerySnapshot snapshot = await _firestore
+//         .collection('income_offers')
+//         .where('id_oferta_de_trabajo', isEqualTo: offerId)
+//         .get();
+
+//     if (snapshot.docs.isNotEmpty) {
+//       return snapshot.docs
+//           .map((doc) => IncomeOffers.fromMap(doc.data() as Map<String, dynamic>))
+//           .first;
+//     } else {
+//       // No se encontró ningún documento con el ID proporcionado
+//       print('No se encontró ninguna oferta de ingreso con ID: $offerId');
+//       return null; // O lanza una excepción personalizada
+//     }
+//   } catch (e) {
+//     print('Error al obtener ofertas de ingreso: $e');
+//     return null; // O lanza una excepción personalizada
+//   }
+// }
+
   // AGREGAR UNA OFERTA DE INGRESO A FIRESTORE
   Future<void> agregarIncomeOffer(IncomeOffers incomeOffer) async {
     try {

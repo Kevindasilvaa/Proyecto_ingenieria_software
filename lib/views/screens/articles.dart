@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:moni/models/clases/article.dart';
+import 'package:moni/views/widgets/CustomDrawer.dart';
 import 'package:moni/views/widgets/articleCard.dart';
 
 class ArticlesPage extends StatelessWidget {
@@ -24,8 +25,14 @@ class ArticlesPage extends StatelessWidget {
       // Para teléfonos, se muestra una tarjeta por fila, centrada
       return Scaffold(
         appBar: AppBar(
-          title: const Text("Artículos Financieros"),
+          backgroundColor: Color(0xFFCECECE),
+          title: Text(
+            'Artículos Financieros',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          centerTitle: true,
         ),
+        drawer: CustomDrawer(),
         body: StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance
               .collection('Articulos')
@@ -83,8 +90,14 @@ class ArticlesPage extends StatelessWidget {
 
       return Scaffold(
         appBar: AppBar(
-          title: const Text("Artículos Financieros"),
+          backgroundColor: Color(0xFFCECECE),
+          title: Text(
+            'Artículos Financieros',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          centerTitle: true,
         ),
+        drawer: CustomDrawer(),
         body: StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance
               .collection('Articulos')
