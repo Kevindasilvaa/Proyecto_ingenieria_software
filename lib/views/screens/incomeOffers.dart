@@ -12,60 +12,73 @@ class IncomeOffersPage extends StatefulWidget {
 }
 
 class _IncomeOffersPageState extends State<IncomeOffersPage> {
-  List<IncomeOffers> _incomeOffers = [];
-  final IncomeOffersController _incomeOffersController = IncomeOffersController();
-  bool _isLoading = true;
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _cargarIncomeOffersInicial();
+    // Cargar las ofertas cuando se inicia la página
+    final incomeOffersController =
+        Provider.of<IncomeOffersController>(context, listen: false);
+    incomeOffersController
+        .cargarTodasLasIncomeOffers(); // Asegúrate de que este método está definido en tu controlador
   }
 
-  Future<void> _cargarIncomeOffersInicial() async {
-    try {
-      await _incomeOffersController.cargarTodasLasIncomeOffers();
-      setState(() {
-        _incomeOffers = _incomeOffersController.incomeOffers;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
-      print('Error al cargar ofertas: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error al cargar las ofertas.'),
-          duration: Duration(seconds: 2),
-        ),
-      );
-    }
+  @override
+  void dispose() {
+    _searchController.dispose(); // Liberar recursos del controlador
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final incomeOffersController = Provider.of<IncomeOffersController>(context);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.grey[200],
-        title: Text('Ofertas de Ingreso Disponibles'),
+        title: TextField(
+          controller: _searchController,
+          decoration: InputDecoration(
+            hintText: 'Buscar ofertas...',
+            border: InputBorder.none,
+            prefixIcon: Icon(Icons.search),
+            contentPadding: EdgeInsets.symmetric(vertical: 12),
+          ),
+          onChanged: (value) {
+            incomeOffersController
+                .filtrarIncomeOffers(value); // Filtra las ofertas
+          },
+        ),
       ),
       drawer: CustomDrawer(),
-      body: _isLoading
-          ? Center(child: CircularProgressIndicator())
-          : _incomeOffers.isEmpty
-              ? Center(child: Text('No hay ofertas disponibles.'))
-              : ListView.builder(
-                  itemCount: _incomeOffers.length,
-                  itemBuilder: (context, index) {
-                    final incomeOffer = _incomeOffers[index];
-                    return _buildIncomeOfferContainer(incomeOffer);
-                  },
-                ),
+      body: Consumer<IncomeOffersController>(
+        builder: (context, controller, child) {
+          final incomeOffers = controller.incomeOffers;
+
+          if (incomeOffers.isEmpty) {
+            return Center(
+                child: Text('No hay ofertas que coincidan con la búsqueda.'));
+          }
+
+          return ListView.builder(
+            itemCount: incomeOffers.length,
+            itemBuilder: (context, index) {
+              final incomeOffer = incomeOffers[index];
+              return _buildIncomeOfferContainer(incomeOffer);
+            },
+          );
+        },
+      ),
     );
   }
 
   Widget _buildIncomeOfferContainer(IncomeOffers incomeOffer) {
+    String formatText(String text) {
+      if (text.isEmpty) return text; // Manejo de texto vacío
+      return text[0].toUpperCase() + text.substring(1).toLowerCase();
+    }
+
     return Container(
       margin: EdgeInsets.symmetric(vertical: 7, horizontal: 25),
       padding: EdgeInsets.all(20),
@@ -88,37 +101,48 @@ class _IncomeOffersPageState extends State<IncomeOffersPage> {
             children: [
               Expanded(
                 child: Text(
-                  incomeOffer.titulo,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  formatText(incomeOffer.titulo), // Capitaliza el título
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                 ),
               ),
               StreamBuilder<DocumentSnapshot>(
                 stream: FirebaseFirestore.instance
                     .collection('users')
-                    .doc(Provider.of<UserController>(context, listen: false).usuario?.id)
+                    .doc(Provider.of<UserController>(context, listen: false)
+                        .usuario
+                        ?.id)
                     .snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.hasData && snapshot.data!.exists) {
-                    final userData = snapshot.data!.data() as Map<String, dynamic>;
-                    final savedOffers = List<dynamic>.from(userData['saved_offers'] ?? []);
-                    final isSaved = savedOffers.contains(incomeOffer.idOfertaDeTrabajo);
+                    final userData =
+                        snapshot.data!.data() as Map<String, dynamic>;
+                    final savedOffers =
+                        List<dynamic>.from(userData['saved_offers'] ?? []);
+                    final isSaved =
+                        savedOffers.contains(incomeOffer.idOfertaDeTrabajo);
                     return IconButton(
                       icon: Icon(
                         isSaved ? Icons.bookmark : Icons.bookmark_border,
                       ),
                       onPressed: () async {
                         if (isSaved) {
-                          await _removeOfferFromSaved(context, incomeOffer.idOfertaDeTrabajo);
+                          await _removeOfferFromSaved(
+                              context, incomeOffer.idOfertaDeTrabajo);
                         } else {
-                          await _addOfferToSaved(context, incomeOffer.idOfertaDeTrabajo);
+                          await _addOfferToSaved(
+                              context, incomeOffer.idOfertaDeTrabajo);
                         }
                       },
                     );
                   } else {
                     return IconButton(
-                      icon: Icon(Icons.bookmark_border),
+                      icon: Icon(
+                        Icons.bookmark_border,
+                        color: Colors.yellow[700],
+                      ),
                       onPressed: () async {
-                        await _addOfferToSaved(context, incomeOffer.idOfertaDeTrabajo);
+                        await _addOfferToSaved(
+                            context, incomeOffer.idOfertaDeTrabajo);
                       },
                     );
                   }
@@ -126,11 +150,45 @@ class _IncomeOffersPageState extends State<IncomeOffersPage> {
               ),
             ],
           ),
-          SizedBox(height: 5),
-          Text(incomeOffer.descripcion),
+          SizedBox(height: 6),
+          // Mostrar la descripción completa
+          Text(
+            formatText(incomeOffer.descripcion),
+            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+          ),
+          SizedBox(height: 6),
+          // Mostrar el contacto
+          Text(
+            'Contacto: ${incomeOffer.email}', // Mostrar el nombre del contacto
+            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+          ),
           SizedBox(height: 8),
-          Text('Pago: \$${incomeOffer.pago.toStringAsFixed(2)}'),
-          Text('Contacto: ${incomeOffer.email}'),
+          Row(
+            children: [
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.blueAccent[50],
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Colors.blueAccent, width: 2),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.attach_money, color: Colors.blueAccent),
+                    SizedBox(width: 4),
+                    Text(
+                      '${incomeOffer.pago.toStringAsFixed(2)} ${incomeOffer.tipoMoneda}',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14, // Ajustado para coherencia
+                        color: Colors.blueAccent,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
@@ -142,20 +200,22 @@ class _IncomeOffersPageState extends State<IncomeOffersPage> {
 
     if (userId != null) {
       try {
-        DocumentSnapshot userSnapshot = await FirebaseFirestore.instance.collection('users').doc(userId).get();
+        DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userId)
+            .get();
         if (userSnapshot.exists) {
-          Map<String, dynamic> userData = userSnapshot.data() as Map<String, dynamic>;
+          Map<String, dynamic> userData =
+              userSnapshot.data() as Map<String, dynamic>;
           List<dynamic> savedOffers = List.from(userData['saved_offers'] ?? []);
-
-       
 
           if (!savedOffers.contains(offerId)) {
             savedOffers.add(offerId);
 
-            await FirebaseFirestore.instance.collection('users').doc(userId).update({'saved_offers': savedOffers});
-
-            // print('Oferta guardada: $offerId');
-            // print(savedOffers);
+            await FirebaseFirestore.instance
+                .collection('users')
+                .doc(userId)
+                .update({'saved_offers': savedOffers});
           }
         }
       } catch (e) {
@@ -164,26 +224,29 @@ class _IncomeOffersPageState extends State<IncomeOffersPage> {
     }
   }
 
-  Future<void> _removeOfferFromSaved(BuildContext context, String offerId) async {
+  Future<void> _removeOfferFromSaved(
+      BuildContext context, String offerId) async {
     final userController = Provider.of<UserController>(context, listen: false);
     final userId = userController.usuario?.id;
 
     if (userId != null) {
       try {
-        DocumentSnapshot userSnapshot = await FirebaseFirestore.instance.collection('users').doc(userId).get();
+        DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userId)
+            .get();
         if (userSnapshot.exists) {
-          Map<String, dynamic> userData = userSnapshot.data() as Map<String, dynamic>;
+          Map<String, dynamic> userData =
+              userSnapshot.data() as Map<String, dynamic>;
           List<dynamic> savedOffers = List.from(userData['saved_offers'] ?? []);
-
-          // print('Lista guardada antes de eliminar: $savedOffers');
 
           if (savedOffers.contains(offerId)) {
             savedOffers.remove(offerId);
 
-            await FirebaseFirestore.instance.collection('users').doc(userId).update({'saved_offers': savedOffers});
-
-            // print('Oferta eliminada: $offerId');
-            // print(savedOffers);
+            await FirebaseFirestore.instance
+                .collection('users')
+                .doc(userId)
+                .update({'saved_offers': savedOffers});
           }
         }
       } catch (e) {

@@ -17,7 +17,8 @@ class MyIncomeOffersPage extends StatefulWidget {
 class _MyIncomeOffersPageState extends State<MyIncomeOffersPage> {
   List<IncomeOffers> _incomeOffers = [];
   StreamSubscription? _incomeOffersSubscription;
-  final IncomeOffersController _incomeOffersController = IncomeOffersController();
+  final IncomeOffersController _incomeOffersController =
+      IncomeOffersController();
   bool _isLoading = true;
 
   @override
@@ -103,76 +104,93 @@ class _MyIncomeOffersPageState extends State<MyIncomeOffersPage> {
           Expanded(
             child: _isLoading
                 ? Center(child: CircularProgressIndicator())
-                : Column(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            if (userEmail != null) {
-                              await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => AddIncomeOfferPage(),
+                : SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Sección "Mis Ofertas" con el botón de agregar
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0, vertical: 8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Mis Ofertas',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
                                 ),
-                              );
-                              await _cargarIncomeOffersInicial();
-                              _iniciarStream();
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                content: Text('Inicia sesión para agregar ofertas'),
-                                duration: Duration(seconds: 2),
-                              ));
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.grey[300],
-                            foregroundColor: Colors.black,
-                            padding: EdgeInsets.symmetric(vertical: 18, horizontal: 32),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          child: Text(
-                            'Publicar Oferta de Ingreso',
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                              ElevatedButton(
+                                onPressed: () async {
+                                  if (userEmail != null) {
+                                    await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            AddIncomeOfferPage(),
+                                      ),
+                                    );
+                                    await _cargarIncomeOffersInicial();
+                                    _iniciarStream();
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                          content: Text(
+                                              'Inicia sesión para agregar ofertas'),
+                                          duration: Duration(seconds: 2)),
+                                    );
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.grey[200],
+                                  foregroundColor: Colors.black87,
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.add,
+                                        color: Colors.black87, size: 25),
+                                    SizedBox(width: 6),
+                                    Text('Agregar',
+                                        style: TextStyle(fontSize: 18)),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ),
-                      SizedBox(height: 10),
-                      Align(
-                        alignment: Alignment.topLeft,
-                        child: Text(
-                          '  Mis publicaciones',
-                          style: TextStyle(
-                            fontSize: 21,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
-                      Container(
-                        child: userEmail != null
+                        SizedBox(height: 8),
+                        userEmail != null
                             ? _buildIncomeOfferList(_incomeOffers, false)
                             : Center(
-                                child: Text('Inicia sesión para ver tus ofertas de ingreso')),
-                      ),
-                      SizedBox(height: 10),
-                      Align(
-                        alignment: Alignment.topLeft,
-                        child: Text(
-                          '  Ofertas Guardadas',
-                          style: TextStyle(
-                            fontSize: 21,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                                child: Text(
+                                    'Inicia sesión para ver tus ofertas de ingreso')),
+
+                        // Separador visual
+                        Divider(
+                          color: Colors.grey,
+                          thickness: 1,
+                          height: 40,
+                        ),
+
+                        // Sección "Ofertas Guardadas"
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Text(
+                            'Ofertas Guardadas',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
                           ),
                         ),
-                      ),
-                      Container(
-                        child: _buildSavedIncomeOffersStream(),//Llamada a la funcion correcta
-                      ),
-                    ],
+                        SizedBox(height: 8),
+                        _buildSavedIncomeOffersStream(),
+                      ],
+                    ),
                   ),
           ),
         ],
@@ -182,7 +200,14 @@ class _MyIncomeOffersPageState extends State<MyIncomeOffersPage> {
 
   Widget _buildIncomeOfferList(List<IncomeOffers> incomeOffers, bool isSaved) {
     if (incomeOffers.isEmpty) {
-      return Center(child: Text('No hay ofertas de ingreso registradas.'));
+      return Center(
+        child: Text(
+          isSaved
+              ? 'No tienes ofertas guardadas.'
+              : 'No hay ofertas de ingreso registradas.',
+          style: TextStyle(fontSize: 18, color: Colors.black54),
+        ),
+      );
     }
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -208,10 +233,11 @@ class _MyIncomeOffersPageState extends State<MyIncomeOffersPage> {
       builder: (context, snapshot) {
         if (snapshot.hasData && snapshot.data!.exists) {
           final userData = snapshot.data!.data() as Map<String, dynamic>;
-          final savedOffersIds = List<String>.from(userData['saved_offers'] ?? []);
+          final savedOffersIds =
+              List<String>.from(userData['saved_offers'] ?? []);
           return FutureBuilder<List<IncomeOffers>>(
             future: _fetchSavedOffers(savedOffersIds),
-            builder: (context,offersSnapshot) {
+            builder: (context, offersSnapshot) {
               if (offersSnapshot.hasData) {
                 return _buildIncomeOfferList(offersSnapshot.data!, true);
               } else if (offersSnapshot.hasError) {
@@ -222,133 +248,155 @@ class _MyIncomeOffersPageState extends State<MyIncomeOffersPage> {
             },
           );
         } else {
-          return Center(child: Text('No hay ofertas guardadas'));
+          return Center(child: Text('No hay ofertas guardadas') as Widget);
         }
       },
     );
   }
 
-  Future<List<IncomeOffers>> _fetchSavedOffers(List<String> savedOffersIds) async {
+  Future<List<IncomeOffers>> _fetchSavedOffers(
+      List<String> savedOffersIds) async {
     List<IncomeOffers> savedOffers = [];
     for (String offerId in savedOffersIds) {
-      IncomeOffers? offer = await _incomeOffersController.getIncomeOfferById(offerId);
+      IncomeOffers? offer =
+          await _incomeOffersController.getIncomeOfferById(offerId);
       if (offer != null) {
         savedOffers.add(offer);
       }
     }
     return savedOffers;
   }
-  
-Widget _buildIncomeOfferContainer(IncomeOffers incomeOffer, bool isSaved) {
-  return Container(
-    margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-    padding: EdgeInsets.all(16),
-    decoration: BoxDecoration(
-      color:const Color(0xFFF9F9F9),
-      borderRadius: BorderRadius.circular(20),
-      boxShadow: [
+
+  Widget _buildIncomeOfferContainer(IncomeOffers incomeOffer, bool isSaved) {
+    String formatText(String text) {
+      if (text.isEmpty) return text; // Manejo de texto vacío
+      return text[0].toUpperCase() + text.substring(1).toLowerCase();
+    }
+
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF9F9F9),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
           BoxShadow(
             color: const Color.fromARGB(255, 124, 124, 124).withOpacity(0.5),
             spreadRadius: 2,
             blurRadius: 5,
-            offset: const Offset(0, 3), 
+            offset: const Offset(0, 3),
           ),
         ],
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      ),
+      // Definimos un tamaño fijo con `SizedBox` o mediante `height`.
+      child: SizedBox(
+        height: 200,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              incomeOffer.titulo,
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black87),
-            ),
-            if (!isSaved) 
-              Row(
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.delete, color: Colors.red, size: 30),
-                    onPressed: () => _confirmarEliminacion(incomeOffer),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  formatText(incomeOffer.titulo),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                    color: Colors.black87,
                   ),
-                ],
-              ),
-          ],
-        ),
-        ExpansionTile(
-          title: Text(
-            'Más detalles',
-            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blueGrey[600]),
-          ),
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(1.0),
-              child: Text(
-                incomeOffer.descripcion,
-                style: TextStyle(color: Colors.grey[600]),
-              ),
+                ),
+                if (!isSaved)
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.delete, color: Colors.red, size: 25),
+                        onPressed: () => _confirmarEliminacion(incomeOffer),
+                      ),
+                    ],
+                  ),
+              ],
             ),
-            SizedBox(height: 1),
+            SizedBox(height: 6),
+            // Mostrar el contacto (aplica para guardadas y no guardadas)
             Text(
-              'Contacto: ${incomeOffer.email}', 
-              style: TextStyle(color: const Color.fromARGB(255, 93, 93, 93)),
-            ),
-            SizedBox(height: 2),
-          ],
-        ),
-        SizedBox(height: 4),
-        Row(
-          children: [
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.blueAccent[50], 
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.blueAccent, width: 2),
+              'Contacto: ${incomeOffer.email}',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.normal,
+                color: Colors.grey[600],
               ),
-              child: Row(
-                children: [
-                  Icon(Icons.attach_money, color: Colors.blueAccent),
-                  SizedBox(width: 4),
-                  Text(
-                    '${incomeOffer.pago} ${incomeOffer.tipoMoneda}',
+            ),
+            SizedBox(height: 6),
+            // Mostrar la descripción completa
+            Expanded(
+              child: Text(
+                formatText(incomeOffer.descripcion),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                  overflow: TextOverflow.ellipsis, // Manejo de texto largo
+                ),
+                maxLines:
+                    8, // Fija el número máximo de líneas para evitar desbordes
+              ),
+            ),
+
+            SizedBox(height: 8),
+            Row(
+              children: [
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.blueAccent[50],
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.blueAccent, width: 2),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.attach_money, color: Colors.blueAccent),
+                      SizedBox(width: 4),
+                      Text(
+                        '${incomeOffer.pago.toStringAsFixed(2)} ${incomeOffer.tipoMoneda}',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          color: Colors.blueAccent,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Spacer(),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: isSaved ? Colors.orange[50] : Colors.green[50],
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                        color: isSaved ? Colors.orange : Colors.green,
+                        width: 2),
+                  ),
+                  child: Text(
+                    isSaved ? 'Guardado' : incomeOffer.estado,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      color: Colors.blueAccent,
+                      fontSize: 14,
+                      color: isSaved ? Colors.orange[600] : Colors.green[600],
                     ),
                   ),
-                ],
-              ),
-            ),
-            Spacer(),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.green[50], 
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.green, width: 2),
-              ),
-              child: Text(
-                incomeOffer.estado,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.green[600],
-                  fontSize: 16,
                 ),
-              ),
+              ],
             ),
           ],
         ),
-      ],
-    ),
-  );
-}
+      ),
+    );
+  }
 
   void _confirmarEliminacion(IncomeOffers incomeOffer) {
     final userController = Provider.of<UserController>(context, listen: false);
-    final offersController = Provider.of<IncomeOffersController>(context, listen: false);
+    final offersController =
+        Provider.of<IncomeOffersController>(context, listen: false);
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -367,12 +415,15 @@ Widget _buildIncomeOfferContainer(IncomeOffers incomeOffer, bool isSaved) {
               child: Text("Eliminar"),
               onPressed: () async {
                 await offersController
-                    .eliminarIncomeOffer(incomeOffer.idOfertaDeTrabajo, incomeOffer.email)
+                    .eliminarIncomeOffer(
+                        incomeOffer.idOfertaDeTrabajo, incomeOffer.email)
                     .then((_) async {
                   Navigator.of(context).pop();
                   _cargarIncomeOffersInicial();
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Oferta de ingreso eliminada exitosamente')),
+                    SnackBar(
+                        content:
+                            Text('Oferta de ingreso eliminada exitosamente')),
                   );
                 }).catchError((error) {
                   ScaffoldMessenger.of(context).showSnackBar(

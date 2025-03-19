@@ -15,6 +15,7 @@ class _AddAccountPageState extends State<AddAccountPage> {
   String _tipo = 'Ahorro';
   double _saldo = 0.0;
   String _tipoMoneda = 'USD';
+  IconData? _selectedIcon; // Nuevo campo para el ícono seleccionado
 
   InputDecoration _inputDecoration(String label) {
     return InputDecoration(
@@ -90,6 +91,44 @@ class _AddAccountPageState extends State<AddAccountPage> {
                   return null;
                 },
               ),
+              SizedBox(height: 20),
+              DropdownButtonFormField<IconData>(
+                decoration: _inputDecoration('Seleccionar ícono'),
+                value: _selectedIcon,
+                onChanged: (value) => setState(() => _selectedIcon = value),
+                items: [
+                  DropdownMenuItem(
+                    value: Icons.account_balance,
+                    child: Row(
+                      children: [
+                        Icon(Icons.account_balance, color: Colors.blue),
+                        SizedBox(width: 10),
+                        Text('Banco'),
+                      ],
+                    ),
+                  ),
+                  DropdownMenuItem(
+                    value: Icons.wallet,
+                    child: Row(
+                      children: [
+                        Icon(Icons.wallet, color: Colors.green),
+                        SizedBox(width: 10),
+                        Text('Billetera'),
+                      ],
+                    ),
+                  ),
+                  DropdownMenuItem(
+                    value: Icons.credit_card,
+                    child: Row(
+                      children: [
+                        Icon(Icons.credit_card, color: Colors.purple),
+                        SizedBox(width: 10),
+                        Text('Tarjeta'),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
               SizedBox(height: 30),
               SizedBox(
                 width: double.infinity,
@@ -110,6 +149,7 @@ class _AddAccountPageState extends State<AddAccountPage> {
                         fechaCreacion: DateTime.now(),
                         userEmail: userEmail,
                         tipoMoneda: _tipoMoneda,
+                        icono: _selectedIcon, // Asignar el ícono seleccionado
                       );
 
                       await Provider.of<CuentaController>(context,
