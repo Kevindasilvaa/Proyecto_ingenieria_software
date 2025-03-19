@@ -6,9 +6,9 @@ import 'package:moni/models/clases/income_offers.dart';
 class IncomeOffersController with ChangeNotifier {
   final FirebaseService _firebaseService = FirebaseService();
   List<IncomeOffers> _incomeOffers = [];
+  List<IncomeOffers> _todasLasIncomeOffers = [];
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   IncomeOffers? _savedIncomeOffers;
-
 
   List<IncomeOffers> get incomeOffers => _incomeOffers;
 
@@ -49,6 +49,7 @@ class IncomeOffersController with ChangeNotifier {
 
   Future<void> cargarTodasLasIncomeOffers() async {
     try {
+      _todasLasIncomeOffers = await _firebaseService.obtenerTodasIncomeOffers();
       _incomeOffers = await _firebaseService.obtenerTodasIncomeOffers();
       notifyListeners(); // Notifica a la vista que los datos han cambiado
     } catch (e) {
@@ -56,28 +57,42 @@ class IncomeOffersController with ChangeNotifier {
     }
   }
 
+  Future<IncomeOffers?> getIncomeOfferById(String id) async {
+    try {
+      final snapshot = await _firestore
+          .collection('income_offers')
+          .where('id_oferta_de_trabajo', isEqualTo: id)
+          .get();
 
-
-
-Future<IncomeOffers?> getIncomeOfferById(String id) async {
-  try {
-    final snapshot = await _firestore
-        .collection('income_offers')
-        .where('id_oferta_de_trabajo', isEqualTo: id)
-        .get();
-
-    if (snapshot.docs.isNotEmpty) {
-      return IncomeOffers.fromMap(snapshot.docs.first.data() as Map<String, dynamic>);
-    } else {
-      return null; // Return null if no matching document is found
+      if (snapshot.docs.isNotEmpty) {
+        return IncomeOffers.fromMap(
+            snapshot.docs.first.data() as Map<String, dynamic>);
+      } else {
+        return null; // Return null if no matching document is found
+      }
+    } catch (e) {
+      print('Error getting IncomeOffer: $e');
+      return null;
     }
-  } catch (e) {
-    print('Error getting IncomeOffer: $e');
-    return null; 
   }
-}
 
+  // Filtrar ofertas de ingreso
+  void filtrarIncomeOffers(String query) {
+    if (query.isEmpty) {
+      // Si el campo está vacío, muestra todas las ofertas
+      _incomeOffers = [
+        ..._todasLasIncomeOffers
+      ]; // Usa una lista original que contiene todas las ofertas
+    } else {
+      _incomeOffers = _todasLasIncomeOffers.where((offer) {
+        final tituloLower = offer.titulo.toLowerCase();
+        final descripcionLower = offer.descripcion.toLowerCase();
+        final queryLower = query.toLowerCase();
 
-
-
+        return tituloLower.contains(queryLower) ||
+            descripcionLower.contains(queryLower);
+      }).toList();
+    }
+    notifyListeners(); // Notifica a la vista que los datos han cambiado
+  }
 }
