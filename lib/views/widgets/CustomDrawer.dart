@@ -256,7 +256,10 @@ class _CustomDrawerState extends State<CustomDrawer> {
     final userController = Provider.of<UserController>(context, listen: false);
     await userController.logOut();
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Cierre de sesión exitoso.')),
+      SnackBar(
+        content: Text('Cierre de sesión exitoso.'),
+        duration: Duration(seconds: 1),
+        ),
     );
     Navigator.pushNamed(context, '/');
   }

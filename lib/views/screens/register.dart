@@ -26,7 +26,10 @@ class _RegisterPageState extends State<RegisterPage> {
 
         if (newUser != null) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Cuenta creada exitosamente.")),
+            SnackBar(
+              content: Text("Cuenta creada exitosamente."),
+              duration: Duration(seconds: 1),
+              ),
           );
           Navigator.pushReplacementNamed(context, '/home');
         } else {
@@ -51,7 +54,10 @@ class _RegisterPageState extends State<RegisterPage> {
       if (userController.usuario != null) {
         Navigator.pushReplacementNamed(context, '/home');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Se inicio sesion exitosamente')),
+          SnackBar(
+            content: Text('Se inicio sesion exitosamente'),
+            duration: Duration(seconds: 1),
+            ),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(

@@ -29,8 +29,9 @@ class _LoginPageState extends State<LoginPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Inicio de sesión exitoso.'),
+              duration: Duration(seconds: 1),
             ),
-          );
+        );
           Navigator.pushReplacementNamed(context, '/home');
         }else{
           ScaffoldMessenger.of(context).showSnackBar(
@@ -52,7 +53,10 @@ class _LoginPageState extends State<LoginPage> {
         // Navegar a la siguiente pantalla
         Navigator.pushReplacementNamed(context, '/home');
         ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Se inicio sesion exitosamente')),
+        SnackBar(
+          content: Text('Se inicio sesion exitosamente'),
+          duration: Duration(seconds: 1),
+          ),
       );
       } else {
         // Mostrar mensaje de error
