@@ -74,6 +74,159 @@ class _AccountsPageState extends State<AccountsPage> {
     }
   }
 
+  void _showAddAccountDialog(BuildContext context,
+      CuentaController cuentaController, String userEmail) {
+    TextEditingController nameController = TextEditingController();
+    TextEditingController saldoController = TextEditingController();
+    String selectedTipo = 'Ahorro';
+    String selectedMoneda = 'USD';
+    IconData? selectedIcon = Icons.account_balance;
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Agregar Cuenta'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: nameController,
+                  decoration: InputDecoration(
+                    labelText: 'Nombre de la cuenta',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                SizedBox(height: 20),
+                DropdownButtonFormField<String>(
+                  value: selectedTipo,
+                  onChanged: (value) => selectedTipo = value!,
+                  decoration: InputDecoration(
+                    labelText: 'Tipo de cuenta',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: ['Ahorro', 'Corriente', 'Inversión']
+                      .map((tipo) =>
+                          DropdownMenuItem(value: tipo, child: Text(tipo)))
+                      .toList(),
+                ),
+                SizedBox(height: 20),
+                DropdownButtonFormField<String>(
+                  value: selectedMoneda,
+                  onChanged: (value) => selectedMoneda = value!,
+                  decoration: InputDecoration(
+                    labelText: 'Tipo de moneda',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: ['BS', 'USD', 'EUR', 'MXN']
+                      .map((moneda) =>
+                          DropdownMenuItem(value: moneda, child: Text(moneda)))
+                      .toList(),
+                ),
+                SizedBox(height: 20),
+                TextField(
+                  controller: saldoController,
+                  decoration: InputDecoration(
+                    labelText: 'Saldo inicial',
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                ),
+                SizedBox(height: 20),
+                DropdownButtonFormField<IconData>(
+                  value: selectedIcon,
+                  onChanged: (value) => selectedIcon = value!,
+                  decoration: InputDecoration(
+                    labelText: 'Seleccionar ícono',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: [
+                    DropdownMenuItem(
+                      value: Icons.account_balance,
+                      child: Row(
+                        children: [
+                          Icon(Icons.account_balance, color: Colors.blue),
+                          SizedBox(width: 10),
+                          Text('Banco'),
+                        ],
+                      ),
+                    ),
+                    DropdownMenuItem(
+                      value: Icons.wallet,
+                      child: Row(
+                        children: [
+                          Icon(Icons.wallet, color: Colors.green),
+                          SizedBox(width: 10),
+                          Text('Billetera'),
+                        ],
+                      ),
+                    ),
+                    DropdownMenuItem(
+                      value: Icons.credit_card,
+                      child: Row(
+                        children: [
+                          Icon(Icons.credit_card, color: Colors.purple),
+                          SizedBox(width: 10),
+                          Text('Tarjeta'),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Cancelar'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final String nombre = nameController.text.trim();
+                final double? saldo =
+                    double.tryParse(saldoController.text.trim());
+
+                if (nombre.isNotEmpty && saldo != null) {
+                  Cuenta nuevaCuenta = Cuenta(
+                    nombre: nombre,
+                    tipo: selectedTipo,
+                    saldo: saldo,
+                    fechaCreacion: DateTime.now(),
+                    userEmail: userEmail,
+                    tipoMoneda: selectedMoneda,
+                    icono: selectedIcon,
+                  );
+
+                  cuentaController.agregarCuenta(nuevaCuenta).then((_) {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Cuenta agregada exitosamente')),
+                    );
+                    _cargarCuentas(); // Recargar cuentas tras agregar
+                  }).catchError((error) {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Error al agregar la cuenta')),
+                    );
+                  });
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Por favor completa todos los campos'),
+                    ),
+                  );
+                }
+              },
+              child: Text('Guardar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final userController = Provider.of<UserController>(context);
@@ -103,13 +256,8 @@ class _AccountsPageState extends State<AccountsPage> {
             child: NavBar(
               onPlusPressed: () async {
                 if (userEmail != null) {
-                  // Navegar a la página para agregar cuenta
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => AddAccountPage()),
-                  );
-                  // Recargar las cuentas después de agregar una nueva
-                  await _cargarCuentas();
+                  // Llama al diálogo en lugar de navegar a otra página
+                  _showAddAccountDialog(context, _cuentaController, userEmail);
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                     content: Text('Inicia sesión para agregar cuentas'),
