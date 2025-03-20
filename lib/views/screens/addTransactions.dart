@@ -233,11 +233,17 @@ class _AddTransactionsPageState extends State<AddTransactionsPage> {
                                   prefixIcon: Icon(Icons.receipt),
                                   labelText: 'Nombre',
                                   labelStyle: TextStyle(
-                                      color:
-                                          const Color.fromARGB(255, 0, 0, 0)),
+                                    color: const Color.fromARGB(255, 0, 0, 0),
+                                  ),
                                   border: InputBorder.none,
                                   contentPadding: EdgeInsets.all(16.0),
                                 ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Por favor, ingresa un nombre.';
+                                  }
+                                  return null;
+                                },
                               ),
                             ),
                             SizedBox(height: 15.0),
@@ -267,13 +273,13 @@ class _AddTransactionsPageState extends State<AddTransactionsPage> {
                             }).toList(),
                             validator: (value) {
                               if (value == null) {
-                                return 'Selecciona una cuenta';
+                                return 'Por favor, selecciona una cuenta.';
                               }
                               return null;
                             },
                           ),
                         ),
-                        SizedBox(height: 15.0),
+                            SizedBox(height: 15.0),
                              Material(
                               elevation: 4.0,
                               borderRadius: BorderRadius.circular(10.0),
@@ -303,7 +309,7 @@ class _AddTransactionsPageState extends State<AddTransactionsPage> {
                                 }).toList(),
                                 validator: (value) {
                                   if (value == null) {
-                                    return 'Selecciona una categoria';
+                                    return 'Por favor, selecciona una categoria.';
                                   }
                                   return null;
                                 },
@@ -400,6 +406,17 @@ class _AddTransactionsPageState extends State<AddTransactionsPage> {
                                           setState(() {
                                             _isLoading = true; // Muestra el indicador de carga
                                           });
+
+                                          //Verifica si el monto esta vacio o null y finaliza el metodo en ese caso y envia un scarffold
+                                          if (_montoController.text.isEmpty || double.tryParse(_montoController.text) == null) {
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(content: Text('Por favor ingresa un monto válido.')),
+                                            );
+                                            setState(() {
+                                              _isLoading = false; // Ocultar el indicador si el monto no es válido
+                                            });
+                                            return;
+                                          }
 
                                           if (_formKey.currentState!.validate()) {
                                             final nuevaTransaccion = Transaccion(
