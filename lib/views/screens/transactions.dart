@@ -58,8 +58,16 @@ class _TransactionsPageState extends State<TransactionsPage> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.grey[200],
-        title: Text('Transacciones'),
+        backgroundColor: const Color(0xFF2E4A5A), // Azul del navbar anterior
+        elevation: 0,
+        title: const Text(
+          'Transacciones',
+          style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.white), // Texto blanco
+        ),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       drawer: CustomDrawer(),
       body: Column(
@@ -68,7 +76,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
             width: double.infinity,
             height: 25,
             decoration: BoxDecoration(
-              color: Colors.grey[200],
+              color: Color(0xFF2E4A5A),
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(45),
                 bottomRight: Radius.circular(45),

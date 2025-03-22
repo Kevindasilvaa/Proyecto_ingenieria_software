@@ -1,16 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-// Este es un input de fecha que puede utilizarse en cualquier pagina
 class DatePickerField extends StatefulWidget {
   final TextEditingController controller;
   final String labelText;
   final DateTime? initialDate;
+  final TextStyle? labelStyle; // Personalización de texto del label
+  final TextStyle? textStyle; // Personalización de texto de selección de fecha
+  final Color? backgroundColor; // Personalización del fondo
+  final ValueChanged<DateTime>? onChanged; // Callback al seleccionar una fecha
 
   DatePickerField({
     required this.controller,
     required this.labelText,
-    this.initialDate, required Null Function(dynamic selectedDate) onChanged,
+    this.initialDate,
+    this.labelStyle,
+    this.textStyle,
+    this.backgroundColor,
+    this.onChanged,
   });
 
   @override
@@ -29,41 +36,37 @@ class _DatePickerFieldState extends State<DatePickerField> {
     if (_selectedDate != null) {
       _controller.text = DateFormat('yyyy-MM-dd').format(_selectedDate!);
     } else {
-      _controller.text = 'No disponible';  // O cualquier texto predeterminado
+      _controller.text = 'No disponible'; // Texto predeterminado
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Material(
-      elevation: 4.0,
-      borderRadius: BorderRadius.circular(10.0),
-      color: const Color.fromARGB(217, 217, 217, 217),
+      elevation: 4.0, // Sombra para mejorar la estética
+      borderRadius: BorderRadius.circular(10.0), // Bordes redondeados
+      color: widget.backgroundColor ?? Colors.white, // Fondo blanco
       child: Row(
         children: [
           Padding(
-            padding: const EdgeInsets.only(left: 16.0), // Padding solo a la izquierda para el icono
-            child: Icon(Icons.calendar_today), // Icono a la izquierda
+            padding: const EdgeInsets.only(left: 11.0), // Espaciado para el ícono
+            child: Icon(Icons.calendar_today, color: widget.labelStyle?.color ?? Colors.black), // Ícono negro para contraste
           ),
-          Expanded( // Para que el texto y el botón se distribuyan correctamente
+          Expanded(
             child: Padding(
-              padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0, bottom: 16.0), // Padding para el texto
-              child: Column( // Para el label y el texto en vertical
-                crossAxisAlignment: CrossAxisAlignment.start, // Alinea el texto a la izquierda
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0), // Espaciado adecuado
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.labelText, // Label
-                    style: TextStyle(
-                      color: Colors.black, // Color del label
-                    ),
+                    widget.labelText,
+                    style: widget.labelStyle ?? const TextStyle(color: Colors.black, fontSize: 14), // Label en negro
                   ),
                   Text(
                     _controller.text.isEmpty || _controller.text == 'No disponible'
-                        ? 'Select Date'
+                        ? 'Seleccione Fecha'
                         : _controller.text,
-                    style: TextStyle(
-                      color: Colors.black, // Color del texto
-                    ),
+                    style: widget.textStyle ?? const TextStyle(color: Colors.black, fontSize: 16), // Texto de fecha en negro
                   ),
                 ],
               ),
@@ -80,12 +83,14 @@ class _DatePickerFieldState extends State<DatePickerField> {
               if (picked != null) {
                 setState(() {
                   _selectedDate = picked;
-                  // Actualizamos el controlador inmediatamente cuando el usuario selecciona la fecha
                   _controller.text = DateFormat('yyyy-MM-dd').format(picked);
+                  if (widget.onChanged != null) {
+                    widget.onChanged!(picked); // Callback
+                  }
                 });
               }
             },
-            icon: Icon(Icons.edit_calendar), 
+            icon: const Icon(Icons.edit_calendar, color: Colors.black), // Ícono de edición negro
           ),
         ],
       ),

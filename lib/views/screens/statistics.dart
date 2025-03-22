@@ -655,9 +655,17 @@ Widget build(BuildContext context) {
 
   return Scaffold(
     appBar: AppBar(
-      backgroundColor: Colors.grey[200],
-      title: Text('Estadísticas'),
-    ),
+        backgroundColor: const Color(0xFF2E4A5A), // Azul del navbar anterior
+        elevation: 0,
+        title: const Text(
+          'Estadísticas',
+          style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.white), // Texto blanco
+        ),
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
     drawer: CustomDrawer(),
     body: Column(
       children: [

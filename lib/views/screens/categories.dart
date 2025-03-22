@@ -12,12 +12,16 @@ class CategoriesPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFFCECECE),
-        title: Text(
+        backgroundColor: const Color(0xFF2E4A5A), // Azul del navbar anterior
+        elevation: 0,
+        title: const Text(
           'Categorías',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.white), // Texto blanco
         ),
-        centerTitle: true,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       drawer: CustomDrawer(),
       body: Padding(
@@ -95,39 +99,72 @@ class CategoriesPage extends StatelessWidget {
   }
 
   void _showDeleteConfirmationDialog(BuildContext context,
-      CategoryController categoryController, String categoryId) {
-    categoryController.getCategoryById(categoryId).then((category) {
-      if (category?.user_email == 'all_users@domain.com') {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text('No puedes eliminar una categoría global.')));
-      } else {
-        showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: Text('Eliminar Categoría'),
-              content: Text('¿Seguro que deseas eliminar esta categoría?'),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text('Cancelar'),
+    CategoryController categoryController, String categoryId) {
+  categoryController.getCategoryById(categoryId).then((category) {
+    if (category?.user_email == 'all_users@domain.com') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No puedes eliminar una categoría global.'),
+        ),
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            backgroundColor: const Color(0xFF2E4A5A), // Fondo azul
+            title: const Text(
+              'Eliminar Categoría',
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold), // Texto blanco
+            ),
+            content: const Text(
+              '¿Seguro que deseas eliminar esta categoría?',
+              style: TextStyle(color: Colors.white), // Texto blanco
+            ),
+            actions: [
+              TextButton(
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(Colors.transparent), // Fondo transparente
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    categoryController.deleteCategory(categoryId).then((_) {
-                      Navigator.pop(context); // Cerrar el diálogo
-                    });
-                  },
-                  child: Text('Eliminar'),
-                  //style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                onPressed: () => Navigator.pop(context),
+                child: const Text(
+                  'Cancelar',
+                  style: TextStyle(color: Colors.white), // Texto blanco
                 ),
-              ],
-            );
-          },
-        );
-      }
-    });
-  }
+              ),
+              TextButton(
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(const Color(0xFFF44336)), // Fondo rojo
+                  shape: MaterialStateProperty.all(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0), // Bordes redondeados
+                    ),
+                  ),
+                ),
+                onPressed: () {
+                  categoryController.deleteCategory(categoryId).then((_) {
+                    Navigator.pop(context); // Cerrar el diálogo
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Categoría eliminada exitosamente.')),
+                    );
+                  }).catchError((error) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Error al eliminar la categoría.')),
+                    );
+                  });
+                },
+                child: const Text(
+                  'Eliminar',
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold), // Texto blanco
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  });
+}
 }
 
 class CreateCategoryDialog extends StatefulWidget {
@@ -149,13 +186,13 @@ class _CreateCategoryDialogState extends State<CreateCategoryDialog> {
   String selectedIcon = '📚';
   Color selectedColor = Colors.red;
 
-  List<Color> colorOptions = [
+  final List<Color> colorOptions = [
     Colors.red,
     Colors.blue,
     Colors.yellow,
     Colors.orange,
     Colors.green,
-    Colors.grey
+    Colors.grey,
   ];
 
   @override
@@ -167,51 +204,79 @@ class _CreateCategoryDialogState extends State<CreateCategoryDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      backgroundColor: const Color(0xFF2E4A5A), // Fondo azul oscuro
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
       ),
-      title: Center(
+      title: const Center(
         child: Text(
           'Crear Categoría',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white, // Texto blanco
+          ),
         ),
       ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          TextField(
-            controller: widget.nameController,
-            textAlign: TextAlign.center,
-            decoration: InputDecoration(
-              labelText: 'Nombre de la categoría',
-              border: OutlineInputBorder(),
-              prefixIcon: Icon(Icons.category),
+          // Input para el nombre
+          Material(
+            elevation: 4.0,
+            borderRadius: BorderRadius.circular(10.0),
+            color: Colors.white, // Fondo blanco
+            child: TextFormField(
+              controller: widget.nameController,
+              decoration: const InputDecoration(
+                labelText: 'Nombre',
+                labelStyle: TextStyle(color: Colors.black), // Texto negro
+                border: InputBorder.none,
+                prefixIcon: Icon(Icons.category, color: Colors.black), // Ícono negro
+                contentPadding: EdgeInsets.all(16.0),
+              ),
             ),
           ),
-          SizedBox(height: 16),
-          DropdownButtonFormField<String>(
-            value: selectedIcon,
-            decoration: InputDecoration(
-              labelText: 'Seleccionar Logo',
-              border: OutlineInputBorder(),
+          const SizedBox(height: 16),
+          // Dropdown para seleccionar ícono
+          Material(
+            elevation: 4.0,
+            borderRadius: BorderRadius.circular(10.0),
+            color: Colors.white, // Fondo blanco
+            child: DropdownButtonFormField<String>(
+              value: selectedIcon,
+              decoration: const InputDecoration(
+                labelText: 'Seleccionar Logo',
+                labelStyle: TextStyle(color: Colors.black), // Texto negro
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.all(16.0),
+              ),
+              items: ['📚', '🛒', '🎮', '💼', '🚗', '🍔', '🏠']
+                  .map((e) => DropdownMenuItem(
+                        value: e,
+                        child: Center(child: Text(e)),
+                      ))
+                  .toList(),
+              onChanged: (value) {
+                if (value != null) {
+                  setState(() {
+                    selectedIcon = value;
+                  });
+                }
+              },
             ),
-            items: ['📚', '🛒', '🎮', '💼', '🚗', '🍔', '🏠']
-                .map((e) => DropdownMenuItem(
-                    value: e, child: Center(child: Text(e))))
-                .toList(),
-            onChanged: (value) {
-              if (value != null) setState(() {
-                selectedIcon = value;
-              });
-            },
           ),
-          SizedBox(height: 16),
-          Text(
+          const SizedBox(height: 16),
+          // Selector de color
+          const Text(
             'Seleccionar Color',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.white, // Texto blanco
+            ),
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: colorOptions.map((color) {
@@ -224,15 +289,14 @@ class _CreateCategoryDialogState extends State<CreateCategoryDialog> {
                 child: Container(
                   width: 30,
                   height: 30,
-                  margin: EdgeInsets.symmetric(horizontal: 5),
+                  margin: const EdgeInsets.symmetric(horizontal: 5),
                   decoration: BoxDecoration(
                     color: color,
                     shape: BoxShape.circle,
                     border: Border.all(
-                        color: selectedColor == color
-                            ? Colors.black
-                            : Colors.transparent,
-                        width: 2),
+                      color: selectedColor == color ? Colors.black : Colors.transparent,
+                      width: 2,
+                    ),
                   ),
                 ),
               );
@@ -244,22 +308,37 @@ class _CreateCategoryDialogState extends State<CreateCategoryDialog> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
+            // Botón Cancelar
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text('Cancelar'),
+              child: const Text(
+                'Cancelar',
+                style: TextStyle(color: Colors.white), // Texto blanco
+              ),
             ),
+            // Botón Agregar
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF5DA6A7), // Fondo verde
+                foregroundColor: Colors.white, // Texto blanco
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0), // Bordes redondeados
+                ),
+              ),
               onPressed: () {
                 if (widget.nameController.text.isNotEmpty) {
                   widget.categoryController
                       .addCategory(
-                          widget.nameController.text, selectedIcon, selectedColor)
+                        widget.nameController.text,
+                        selectedIcon,
+                        selectedColor,
+                      )
                       .then((_) {
                     Navigator.pop(context);
                   });
                 }
               },
-              child: Text('Agregar'),
+              child: const Text('Agregar'),
             ),
           ],
         ),

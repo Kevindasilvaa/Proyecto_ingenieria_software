@@ -4,8 +4,18 @@ class CustomButton extends StatefulWidget {
   final VoidCallback onPressed;
   final String text;
   final double width; // Ancho del botón
+  final Color? backgroundColor; // Nuevo parámetro para el color de fondo
+  final TextStyle? textStyle; // Nuevo parámetro para personalizar el estilo del texto
+  final Color? hoverColor; // Nuevo parámetro para el color de fondo al estar sobrevolado
 
-  CustomButton({required this.onPressed, required this.text, this.width = double.infinity});
+  CustomButton({
+    required this.onPressed,
+    required this.text,
+    this.width = double.infinity,
+    this.backgroundColor,
+    this.textStyle,
+    this.hoverColor,
+  });
 
   @override
   _CustomButtonState createState() => _CustomButtonState();
@@ -33,15 +43,18 @@ class _CustomButtonState extends State<CustomButton> {
           onPressed: widget.onPressed,
           child: Text(
             widget.text,
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
-            ),
+            style: widget.textStyle ??
+                const TextStyle(
+                  color: Colors.black, // Texto predeterminado negro
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                ),
           ),
           style: ElevatedButton.styleFrom(
-            backgroundColor: _isHovered ? Colors.grey[500] : Colors.grey[600], // Cambio de color al estar sobre el botón
-            padding: EdgeInsets.symmetric(vertical: 16),
+            backgroundColor: _isHovered
+                ? widget.hoverColor ?? Colors.grey[500] // Fondo configurado al estar sobrevolado
+                : widget.backgroundColor ?? Colors.grey[600], // Fondo predeterminado
+            padding: const EdgeInsets.symmetric(vertical: 16),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),

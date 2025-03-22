@@ -25,13 +25,17 @@ class ArticlesPage extends StatelessWidget {
       // Para teléfonos, se muestra una tarjeta por fila, centrada
       return Scaffold(
         appBar: AppBar(
-          backgroundColor: Color(0xFFCECECE),
-          title: Text(
-            'Artículos Financieros',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          centerTitle: true,
+        backgroundColor: const Color(0xFF2E4A5A), // Fondo azul oscuro
+        title: const Text(
+          'Artículos Financieros',
+          style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.white), // Texto blanco
         ),
+        centerTitle: true,
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
         drawer: CustomDrawer(),
         body: StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance
@@ -89,14 +93,18 @@ class ArticlesPage extends StatelessWidget {
       final double childAspectRatio = gridCardWidth / gridCardHeight;
 
       return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Color(0xFFCECECE),
-          title: Text(
-            'Artículos Financieros',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          centerTitle: true,
+       appBar: AppBar(
+        backgroundColor: const Color(0xFF2E4A5A), // Fondo azul oscuro
+        title: const Text(
+          'Artículos Financieros',
+          style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.white), // Texto blanco
         ),
+        centerTitle: true,
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
         drawer: CustomDrawer(),
         body: StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance

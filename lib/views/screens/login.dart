@@ -74,160 +74,181 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          // Fondo gris superior con título
-          Container(
-            height: MediaQuery.of(context).size.height * 0.30,
+Widget build(BuildContext context) {
+  return Scaffold(
+    body: Stack(
+      children: [
+        // Fondo superior con azul oscuro y título
+        Container(
+          height: MediaQuery.of(context).size.height * 0.20,
+          decoration: BoxDecoration(
+            color: const Color(0xFF2E4A5A), // Fondo azul oscuro
+            borderRadius: const BorderRadius.only(
+              bottomLeft: Radius.circular(30),
+              bottomRight: Radius.circular(30),
+            ),
+          ),
+          child: const Center(
+            child: Text(
+              'Iniciar Sesión',
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Colors.white, // Texto blanco
+              ),
+            ),
+          ),
+        ),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: Container(
+            height: MediaQuery.of(context).size.height * 0.15,
             decoration: BoxDecoration(
-              color: const Color(0xFFF2F2F2),
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(40),
-                bottomRight: Radius.circular(40),
+              color: const Color(0xFF2E4A5A), // Fondo azul oscuro
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(30),
+                topRight: Radius.circular(30),
               ),
             ),
             child: const Center(
-              child: Text(
-                'Iniciar  Sesión',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Container(
-              height: MediaQuery.of(context).size.height * 0.15,
-              decoration: BoxDecoration(
-                color: const Color(0xFFF2F2F2),
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(40),
-                  topRight: Radius.circular(40),
-                ),
-              ),
-              child: const Center(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Text(
-                    'Al iniciar sesión con una cuenta, aceptas los Términos de Servicio y la Política de Privacidad de MONI.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 12),
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                child: Text(
+                  'Al iniciar sesión con una cuenta, aceptas los Términos de Servicio y la Política de Privacidad de MONI.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.white70, // Texto blanco translúcido
                   ),
                 ),
               ),
             ),
           ),
-          // Contenido principal centrado
-          Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: Container(
-                padding: const EdgeInsets.all(24.0),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      const SizedBox(height: 60),
-                      CustomTextField(
-                        controller: _emailController,
-                        labelText: 'Email',
-                        hintText: 'Ingresa tu email',
-                        prefixIcon: Icons.email,
-                        suffixIcon: Icons.close,
-                        keyboardType: TextInputType.emailAddress,
-                        onSuffixIconTap: () {
-                          _emailController.clear();
-                        },
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Por favor, ingresa tu email';
-                          }
-                          return null;
-                        },
-                      ),
-                      CustomTextField(
-                        controller: _passwordController,
-                        labelText: 'Contraseña',
-                        hintText: 'Ingresa tu contraseña',
-                        prefixIcon: Icons.lock,
-                        suffixIcon: _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-                        keyboardType: TextInputType.text,
-                        obscureText: !_isPasswordVisible,
-                        onSuffixIconTap: () {
-                          setState(() {
-                            _isPasswordVisible = !_isPasswordVisible;
-                          });
-                        },
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Por favor, ingresa tu contraseña';
-                          }
-                          return null;
-                        },
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pushNamed(context, '/register');
-                        },
-                        child: const Text(
-                          '¿No tienes una cuenta? ¡Crea una!',
-                          style: TextStyle(
-                            color: Colors.blue,
-                          ),
+        ),
+        // Contenido principal centrado
+        Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16.0),
+            child: Container(
+              padding: const EdgeInsets.all(24.0),
+              decoration: BoxDecoration(
+                color: Colors.white, // Fondo blanco para el formulario
+                borderRadius: BorderRadius.circular(16.0),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26, // Sombra suave
+                    offset: const Offset(0, 4),
+                    blurRadius: 10.0,
+                  ),
+                ],
+              ),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    CustomTextField(
+                      controller: _emailController,
+                      labelText: 'Email',
+                      hintText: 'Ingresa tu email',
+                      prefixIcon: Icons.email,
+                      suffixIcon: Icons.close,
+                      keyboardType: TextInputType.emailAddress,
+                      onSuffixIconTap: () {
+                        _emailController.clear();
+                      },
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return 'Por favor, ingresa tu email';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    CustomTextField(
+                      controller: _passwordController,
+                      labelText: 'Contraseña',
+                      hintText: 'Ingresa tu contraseña',
+                      prefixIcon: Icons.lock,
+                      suffixIcon: _isPasswordVisible
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                      keyboardType: TextInputType.text,
+                      obscureText: !_isPasswordVisible,
+                      onSuffixIconTap: () {
+                        setState(() {
+                          _isPasswordVisible = !_isPasswordVisible;
+                        });
+                      },
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return 'Por favor, ingresa tu contraseña';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/register');
+                      },
+                      child: const Text(
+                        '¿No tienes una cuenta? ¡Crea una!',
+                        style: TextStyle(
+                          color: Color(0xFF5DA6A7), // Texto verde
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                      CustomButton(
-                        onPressed: signIn,
-                        text: 'INICIAR SESIÓN',
+                    ),
+                    CustomButton(
+                      onPressed: signIn,
+                      text: 'INICIAR SESIÓN',
+                      backgroundColor: const Color(0xFF5DA6A7), // Fondo verde
+                      textStyle: const TextStyle(
+                        color: Colors.white, // Texto blanco
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
                       ),
-                      const SizedBox(height: 20),
-                      Row( // Usamos Row para centrar el texto con líneas
-                        children: [
-                          Expanded( // Widget Expanded para la línea izquierda
-                            child: Center(
-                              child: Container(
-                                height: 1,
-                                color: Colors.grey,
-                              ),
-                            ),
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            height: 1,
+                            color: Colors.grey[400], // Línea gris
                           ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                            child: Text(
-                              'O',
-                              style: TextStyle(fontSize: 16),
-                            ),
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Text(
+                            'O',
+                            style: TextStyle(fontSize: 16),
                           ),
-                          Expanded( // Widget Expanded para la línea derecha
-                            child: Center(
-                              child: Container(
-                                height: 1,
-                                color: Colors.grey,
-                              ),
-                            ),
+                        ),
+                        Expanded(
+                          child: Container(
+                            height: 1,
+                            color: Colors.grey[400], // Línea gris
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      GoogleSignInButton(
-                        onPressed: () {
-                          signInWithGoogle();
-                        },
-                      ),
-                    ],
-                  ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    GoogleSignInButton(
+                      onPressed: () {
+                        signInWithGoogle();
+                      },
+                    ),
+                  ],
                 ),
               ),
             ),
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
 }

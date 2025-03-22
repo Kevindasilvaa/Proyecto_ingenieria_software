@@ -6,6 +6,8 @@ class CustomDropdown extends StatelessWidget {
   final IconData icon;
   final List<String> items;
   final ValueChanged<String?>? onChanged; // onChanged es opcional
+  final TextStyle? labelStyle; // Nuevo parámetro para personalizar el estilo de texto
+  final Color? backgroundColor; // Nuevo parámetro para el color de fondo
 
   CustomDropdown({
     required this.controller,
@@ -13,6 +15,8 @@ class CustomDropdown extends StatelessWidget {
     required this.icon,
     required this.items,
     this.onChanged,
+    this.labelStyle, // Inicializamos el estilo como opcional
+    this.backgroundColor, // Inicializamos el color de fondo como opcional
   });
 
   @override
@@ -20,14 +24,14 @@ class CustomDropdown extends StatelessWidget {
     return Material(
       elevation: 4.0,
       borderRadius: BorderRadius.circular(10.0),
-      color: const Color.fromARGB(217, 217, 217, 217),
+      color: backgroundColor ?? Colors.white, // Fondo blanco aplicado por defecto
       child: DropdownButtonFormField<String>(
         decoration: InputDecoration(
           labelText: labelText,
-          labelStyle: TextStyle(color: Colors.black),
+          labelStyle: labelStyle ?? const TextStyle(color: Colors.black), // Aplicamos estilo de texto negro
           border: InputBorder.none,
-          contentPadding: EdgeInsets.all(16.0),
-          prefixIcon: Icon(icon),
+          contentPadding: const EdgeInsets.all(16.0),
+          prefixIcon: Icon(icon, color: labelStyle?.color ?? Colors.black), // Ícono ajustado al estilo de texto
         ),
         value: controller.text.isNotEmpty ? controller.text : null, // Usamos el valor del controlador
         onChanged: (newValue) {
@@ -39,7 +43,10 @@ class CustomDropdown extends StatelessWidget {
         items: items.map<DropdownMenuItem<String>>((String value) {
           return DropdownMenuItem<String>(
             value: value,
-            child: Text(value),
+            child: Text(
+              value,
+              style: labelStyle ?? const TextStyle(color: Colors.black), // Aplicamos estilo de texto negro a las opciones
+            ),
           );
         }).toList(),
         validator: (value) {
@@ -52,3 +59,4 @@ class CustomDropdown extends StatelessWidget {
     );
   }
 }
+

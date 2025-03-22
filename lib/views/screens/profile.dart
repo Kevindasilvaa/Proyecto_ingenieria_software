@@ -51,18 +51,18 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _updateProfile() async {
-    // Validación del número de teléfono
     if (_phoneController.text.length < 10) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: El número debe tener al menos 10 dígitos')));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Error: El número debe tener al menos 10 dígitos')));
     } else {
-      // Solo se continúa si el número de teléfono es válido (más de 10 dígitos)
       final userController = Provider.of<UserController>(context, listen: false);
       final updatedUser = Usuario(
         id: userController.usuario!.id,
         email: userController.usuario!.email,
         name: _nameController.text,
         gender: _genderController.text,
-        birthdate: DateTime.tryParse(_birthdateController.text) ?? DateTime.now(),
+        birthdate:
+            DateTime.tryParse(_birthdateController.text) ?? DateTime.now(),
         country: _countryController.text,
         phone_number: _phoneController.text,
         monthlyIncomeBudget: double.tryParse(_incomeBudgetController.text),
@@ -70,14 +70,13 @@ class _ProfilePageState extends State<ProfilePage> {
       );
 
       try {
-        // Intentamos actualizar el perfil en la base de datos
         await userController.actualizarUsuarioEnFirestore(updatedUser);
         userController.usuario = updatedUser;
-        // Si todo va bien, mostramos un mensaje de éxito
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Perfil actualizado')));
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Perfil actualizado')));
       } catch (e) {
-        // Si ocurre un error, mostramos un mensaje de error
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error al actualizar el perfil: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('Error al actualizar el perfil')));
       }
     }
   }
@@ -87,59 +86,68 @@ class _ProfilePageState extends State<ProfilePage> {
     final userController = Provider.of<UserController>(context);
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFFCECECE),
-        title: Text(
+        backgroundColor: const Color(0xFF2E4A5A), // Fondo azul oscuro
+        title: const Text(
           'Perfil',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.white), // Texto blanco
         ),
         centerTitle: true,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       drawer: CustomDrawer(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ListView(
           children: [
-            CircleAvatar(
+            const CircleAvatar(
               radius: 50,
-              child: Icon(Icons.person, size: 50),
+              backgroundColor: Color(0xFF5DA6A7), // Fondo verde del avatar
+              child: Icon(Icons.person, size: 50, color: Colors.white), // Ícono blanco
             ),
             Center(
               child: Text(
                 userController.usuario!.email,
-                style: TextStyle(fontSize: 16),
+                style: const TextStyle(fontSize: 16, color: Colors.black), // Texto blanco
               ),
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Material(
               elevation: 4.0,
               borderRadius: BorderRadius.circular(10.0),
-              color: const Color.fromARGB(217, 217, 217, 217),
+              color: Colors.white, // Fondo blanco
               child: TextFormField(
                 controller: _nameController,
-                decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.person),
+                decoration: const InputDecoration(
+                  prefixIcon: Icon(Icons.person, color: Colors.black), // Ícono negro
                   labelText: 'Nombre',
-                  labelStyle: TextStyle(color: const Color.fromARGB(255, 0, 0, 0)),
+                  labelStyle: TextStyle(color: Colors.black), // Texto negro
                   border: InputBorder.none,
                   contentPadding: EdgeInsets.all(16.0),
                 ),
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             CustomDropdown(
               controller: _genderController,
               labelText: 'Género',
               icon: Icons.accessibility,
               items: ['Masculino', 'Femenino', 'Otro', 'No disponible'],
+              backgroundColor: Colors.white, // Fondo blanco
+              labelStyle: const TextStyle(color: Colors.black), // Texto negro
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             DatePickerField(
               controller: _birthdateController,
               labelText: 'Fecha de nacimiento',
               initialDate: userController.usuario?.birthdate,
+              backgroundColor: Colors.white, // Fondo blanco
+              labelStyle: const TextStyle(color: Colors.black), // Texto negro
               onChanged: (selectedDate) {},
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             CustomDropdown(
               controller: _countryController,
               labelText: 'Nacionalidad',
@@ -164,57 +172,63 @@ class _ProfilePageState extends State<ProfilePage> {
                 'Japón',
                 'Venezuela'
               ],
+              backgroundColor: Colors.white, // Fondo blanco
+              labelStyle: const TextStyle(color: Colors.black), // Texto negro
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             CustomPhoneField(
               controller: _phoneController,
               labelText: 'Número de teléfono',
               hintText: 'Ejemplo: 4241305112',
+              backgroundColor: Colors.white, // Fondo blanco
+              labelStyle: const TextStyle(color: Colors.black), // Texto negro
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Material(
               elevation: 4.0,
               borderRadius: BorderRadius.circular(10.0),
-              color: const Color.fromARGB(217, 217, 217, 217),
+              color: Colors.white, // Fondo blanco
               child: TextFormField(
                 controller: _incomeBudgetController,
                 keyboardType: TextInputType.numberWithOptions(decimal: true),
                 inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')), // Permitir solo números, punto y coma
+                  FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')), // Permitir solo números
                 ],
-                decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.arrow_upward),
+                decoration: const InputDecoration(
+                  prefixIcon: Icon(Icons.arrow_upward, color: Colors.black), // Ícono negro
                   labelText: 'Presupuesto de Ingreso Mensual',
-                  labelStyle: TextStyle(color: const Color.fromARGB(255, 0, 0, 0)),
+                  labelStyle: TextStyle(color: Colors.black), // Texto negro
                   border: InputBorder.none,
                   contentPadding: EdgeInsets.all(16.0),
                 ),
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Material(
               elevation: 4.0,
               borderRadius: BorderRadius.circular(10.0),
-              color: const Color.fromARGB(217, 217, 217, 217),
+              color: Colors.white, // Fondo blanco
               child: TextFormField(
                 controller: _expenseBudgetController,
                 keyboardType: TextInputType.numberWithOptions(decimal: true),
                 inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')), // Permitir solo números, punto y coma
+                  FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')), // Permitir solo números
                 ],
-                decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.arrow_downward),
+                decoration: const InputDecoration(
+                  prefixIcon: Icon(Icons.arrow_downward, color: Colors.black), // Ícono negro
                   labelText: 'Presupuesto de Gasto Mensual',
-                  labelStyle: TextStyle(color: const Color.fromARGB(255, 0, 0, 0)),
+                  labelStyle: TextStyle(color: Colors.black), // Texto negro
                   border: InputBorder.none,
                   contentPadding: EdgeInsets.all(16.0),
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             CustomButton(
               onPressed: _updateProfile,
               text: 'Actualizar Perfil',
+              backgroundColor: const Color(0xFF5DA6A7), 
+              textStyle: const TextStyle(color: Colors.white), // Texto blanco
             ),
           ],
         ),
