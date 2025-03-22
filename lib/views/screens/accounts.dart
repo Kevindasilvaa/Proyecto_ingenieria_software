@@ -7,7 +7,6 @@ import 'package:moni/views/widgets/CustomDrawer.dart';
 import 'package:moni/views/widgets/NavBar.dart';
 import 'package:moni/views/widgets/AddAccountButton.dart';
 import 'package:provider/provider.dart';
-import 'package:moni/views/screens/addAccount.dart';
 
 class AccountsPage extends StatefulWidget {
   @override

@@ -17,7 +17,6 @@ import 'package:moni/views/screens/statistics.dart';
 import 'package:moni/views/screens/transactions.dart';
 import 'package:provider/provider.dart';
 import 'package:moni/views/screens/addTransactions.dart';
-import 'package:moni/views/screens/addAccount.dart';
 import 'package:moni/views/screens/articles.dart';
 
 void main() async {
@@ -75,7 +74,6 @@ class MyApp extends StatelessWidget {
         '/my_income_offers': (context) => MyIncomeOffersPage(),
         '/categories': (context) => CategoriesPage(),
         '/accounts': (context) => AccountsPage(),
-        '/addAccounts': (context) => AddAccountPage(),
         '/articles': (context) => ArticlesPage(),
       },
       initialRoute: '/home', // Ruta inicial de la aplicación

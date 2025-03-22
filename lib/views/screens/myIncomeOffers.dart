@@ -8,7 +8,6 @@ import 'package:moni/views/widgets/CustomDrawer.dart';
 import 'package:moni/views/widgets/NavBar.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:moni/views/screens/AddIncomeOffer.dart';
 
 class MyIncomeOffersPage extends StatefulWidget {
   @override
