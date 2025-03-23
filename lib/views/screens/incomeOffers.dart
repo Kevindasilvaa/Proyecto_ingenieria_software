@@ -41,17 +41,22 @@ class _IncomeOffersPageState extends State<IncomeOffersPage> {
           controller: _searchController,
           decoration: InputDecoration(
             hintText: 'Buscar ofertas...',
-            hintStyle: const TextStyle(color: Colors.white70), // Texto de hint en blanco translúcido
+            hintStyle: const TextStyle(
+                color: Colors.white70), // Texto de hint en blanco translúcido
             border: InputBorder.none,
-            prefixIcon: const Icon(Icons.search, color: Colors.white), // Ícono blanco
+            prefixIcon:
+                const Icon(Icons.search, color: Colors.white), // Ícono blanco
             contentPadding: const EdgeInsets.symmetric(vertical: 12),
           ),
-          style: const TextStyle(color: Colors.white), // Texto ingresado en blanco
+          style:
+              const TextStyle(color: Colors.white), // Texto ingresado en blanco
           onChanged: (value) {
-            incomeOffersController.filtrarIncomeOffers(value); // Filtra las ofertas
+            incomeOffersController
+                .filtrarIncomeOffers(value); // Filtra las ofertas
           },
         ),
-        iconTheme: const IconThemeData(color: Colors.white), // Íconos del AppBar en blanco
+        iconTheme: const IconThemeData(
+            color: Colors.white), // Íconos del AppBar en blanco
       ),
       drawer: CustomDrawer(),
       body: Consumer<IncomeOffersController>(
