@@ -11,6 +11,7 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
 import 'package:moni/views/widgets/EditTransaction.dart';
 import 'package:moni/views/widgets/TransactionCard.dart'; // Importa el widget TransactionCard
+import 'package:moni/views/widgets/AddTransactionDialog.dart'; // Importa el cuadro de diálogo
 
 class TransactionsPage extends StatefulWidget {
   @override
@@ -114,7 +115,11 @@ class _TransactionsPageState extends State<TransactionsPage> {
             height: 100.0,
             child: NavBar(
               onPlusPressed: () {
-                Navigator.of(context).pushNamed('/addTransactions');
+                showDialog(
+                  context: context,
+                  builder: (context) =>
+                      AddTransactionDialog(), // Aquí llamamos al cuadro de diálogo
+                );
               },
               currentPage: '/transactions',
             ),
@@ -133,7 +138,8 @@ class _TransactionsPageState extends State<TransactionsPage> {
       itemCount: transactions.length,
       itemBuilder: (context, index) {
         final transaccion = transactions[index];
-        return TransactionCard(transaccion: transaccion); // Usamos TransactionCard aquí
+        return TransactionCard(
+            transaccion: transaccion); // Usamos TransactionCard aquí
       },
     );
   }
