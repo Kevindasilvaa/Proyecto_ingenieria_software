@@ -87,9 +87,14 @@ class _AccountsPageState extends State<AccountsPage> {
         builder: (BuildContext context, StateSetter setState) {
           return AlertDialog(
             backgroundColor: const Color(0xFF2E4A5A), // Fondo azul oscuro
-            title: const Text(
-              'Agregar Cuenta',
-              style: TextStyle(color: Colors.white), // Texto blanco
+             title: const Center(
+              child: Text(
+               'Agregar Cuenta',
+                style: TextStyle(
+                  color: Colors.white, // Texto blanco
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
             content: SizedBox(
               width: MediaQuery.of(context).size.width * 0.9, // Ancho ajustado

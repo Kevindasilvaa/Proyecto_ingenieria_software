@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:moni/views/widgets/CustomButton.dart';
+import 'package:moni/views/widgets/DatePickerField.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
@@ -60,10 +62,26 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text('Agregar Transacción'),
-      content: SingleChildScrollView(
+Widget build(BuildContext context) {
+  final TextEditingController _fechaController = TextEditingController();
+
+  return AlertDialog(
+    backgroundColor: const Color(0xFF2E4A5A), // Fondo azul oscuro
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(20),
+    ),
+    title: const Center(
+      child: Text(
+        'Agregar Transacción',
+        style: TextStyle(
+          color: Colors.white, // Texto blanco
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    ),
+    content: SizedBox(
+      width: MediaQuery.of(context).size.width * 0.9, // Ancho ajustado
+      child: SingleChildScrollView(
         child: Form(
           key: _formKey,
           child: Column(
@@ -76,219 +94,295 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                   GestureDetector(
                     onTap: () => setState(() => _ingreso = true),
                     child: AnimatedContainer(
-                      duration: Duration(milliseconds: 150),
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                      duration: const Duration(milliseconds: 150),
+                      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
                       decoration: BoxDecoration(
-                        color: _ingreso ? Colors.green.withOpacity(0.7) : null,
+                        color: _ingreso ? Colors.green.withOpacity(0.7) : Colors.white,
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: Text(
+                      child: const Text(
                         'Ingreso',
-                        style: TextStyle(fontSize: 22),
+                        style: TextStyle(fontSize: 22, color: Colors.black),
                       ),
                     ),
                   ),
-                  SizedBox(width: 20),
+                  const SizedBox(width: 20),
                   GestureDetector(
                     onTap: () => setState(() => _ingreso = false),
                     child: AnimatedContainer(
-                      duration: Duration(milliseconds: 150),
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                      duration: const Duration(milliseconds: 150),
+                      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
                       decoration: BoxDecoration(
-                        color: !_ingreso ? Colors.red.withOpacity(0.7) : null,
+                        color: !_ingreso ? Colors.red.withOpacity(0.7) : Colors.white,
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: Text(
+                      child: const Text(
                         'Gasto',
-                        style: TextStyle(fontSize: 22),
+                        style: TextStyle(fontSize: 22, color: Colors.black),
                       ),
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
               // Campo para monto
-              TextFormField(
-                controller: _montoController,
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
-                decoration: InputDecoration(labelText: 'Monto'),
-                validator: (value) {
-                  if (value == null ||
-                      value.isEmpty ||
-                      double.tryParse(value) == null) {
-                    return 'Por favor, ingresa un monto válido.';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 15),
-              // Campo para nombre
-              TextFormField(
-                controller: _nombreController,
-                decoration: InputDecoration(labelText: 'Nombre'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor, ingresa un nombre.';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 15),
-              // Dropdown para seleccionar cuenta
-              DropdownButtonFormField<String>(
-                value: _cuentaSeleccionada,
-                onChanged: (newValue) => setState(() {
-                  _cuentaSeleccionada = newValue;
-                }),
-                decoration: InputDecoration(labelText: 'Cuenta'),
-                items: _cuentas.map((cuenta) {
-                  return DropdownMenuItem(
-                    value: cuenta.idCuenta,
-                    child: Text(cuenta.nombre),
-                  );
-                }).toList(),
-                validator: (value) {
-                  if (value == null) {
-                    return 'Por favor, selecciona una cuenta.';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 15),
-              // Dropdown para seleccionar categoría
-              DropdownButtonFormField<String>(
-                value: _categoriaSeleccionada,
-                onChanged: (newValue) => setState(() {
-                  _categoriaSeleccionada = newValue;
-                }),
-                decoration: InputDecoration(labelText: 'Categoría'),
-                items: _categorias.map((categoria) {
-                  return DropdownMenuItem(
-                    value: categoria.id,
-                    child: Text(categoria.name),
-                  );
-                }).toList(),
-                validator: (value) {
-                  if (value == null) {
-                    return 'Por favor, selecciona una categoría.';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 15),
-              // Selector de fecha
-              Row(
-                children: [
-                  Icon(Icons.calendar_today),
-                  SizedBox(width: 10),
-                  TextButton(
-                    onPressed: () async {
-                      final pickedDate = await showDatePicker(
-                        context: context,
-                        initialDate: _fechaSeleccionada ?? DateTime.now(),
-                        firstDate: DateTime(2000),
-                        lastDate: DateTime(2101),
-                      );
-                      if (pickedDate != null) {
-                        setState(() {
-                          _fechaSeleccionada = pickedDate;
-                        });
-                      }
-                    },
-                    child: Text(
-                      _fechaSeleccionada == null
-                          ? 'Seleccionar fecha'
-                          : DateFormat.yMd().format(_fechaSeleccionada!),
-                    ),
+              Material(
+                elevation: 4.0,
+                borderRadius: BorderRadius.circular(10.0),
+                color: Colors.white,
+                child: TextFormField(
+                  controller: _montoController,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  decoration: const InputDecoration(
+                    labelText: 'Monto',
+                    labelStyle: TextStyle(color: Colors.black),
+                    border: InputBorder.none,
+                    prefixIcon: Icon(Icons.money, color: Colors.black),
+                    contentPadding: EdgeInsets.all(16.0),
                   ),
-                ],
+                  validator: (value) {
+                    if (value == null || value.isEmpty || double.tryParse(value) == null) {
+                      return 'Por favor, ingresa un monto válido.';
+                    }
+                    return null;
+                  },
+                ),
               ),
-            ],
+              const SizedBox(height: 15),
+              // Campo para nombre
+              Material(
+                elevation: 4.0,
+                borderRadius: BorderRadius.circular(10.0),
+                color: Colors.white,
+                child: TextFormField(
+                  controller: _nombreController,
+                  decoration: const InputDecoration(
+                    labelText: 'Nombre',
+                    labelStyle: TextStyle(color: Colors.black),
+                    border: InputBorder.none,
+                    prefixIcon: Icon(Icons.receipt, color: Colors.black),
+                    contentPadding: EdgeInsets.all(16.0),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor, ingresa un nombre.';
+                    }
+                    return null;
+                  },
+                ),
+              ),
+              const SizedBox(height: 15),
+              // Dropdown para seleccionar cuenta
+              Material(
+                elevation: 4.0,
+                borderRadius: BorderRadius.circular(10.0),
+                color: Colors.white,
+                child: DropdownButtonFormField<String>(
+                  value: _cuentaSeleccionada,
+                  onChanged: (newValue) => setState(() {
+                    _cuentaSeleccionada = newValue!;
+                  }),
+                  decoration: const InputDecoration(
+                    labelText: 'Cuenta',
+                    labelStyle: TextStyle(color: Colors.black),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.all(16.0),
+                    prefixIcon: Icon(Icons.account_balance, color: Colors.black),
+                  ),
+                  items: _cuentas.map((cuenta) {
+                    return DropdownMenuItem(
+                      value: cuenta.idCuenta,
+                      child: Text(cuenta.nombre),
+                    );
+                  }).toList(),
+                  validator: (value) {
+                    if (value == null) {
+                      return 'Por favor, selecciona una cuenta.';
+                    }
+                    return null;
+                  },
+                ),
+              ),
+              const SizedBox(height: 15),
+              // Dropdown para seleccionar categoría
+              Material(
+                elevation: 4.0,
+                borderRadius: BorderRadius.circular(10.0),
+                color: Colors.white,
+                child: DropdownButtonFormField<String>(
+                  value: _categoriaSeleccionada,
+                  onChanged: (newValue) => setState(() {
+                    _categoriaSeleccionada = newValue!;
+                  }),
+                  decoration: const InputDecoration(
+                    labelText: 'Categoría',
+                    labelStyle: TextStyle(color: Colors.black),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.all(16.0),
+                    prefixIcon: Icon(Icons.category, color: Colors.black),
+                  ),
+                  items: _categorias.map((categoria) {
+                    return DropdownMenuItem(
+                      value: categoria.id,
+                      child: Text(categoria.name),
+                    );
+                  }).toList(),
+                  validator: (value) {
+                    if (value == null) {
+                      return 'Por favor, selecciona una categoría.';
+                    }
+                    return null;
+                  },
+                ),
+              ),
+              const SizedBox(height: 15),
+              // Input para seleccionar la fecha
+              DatePickerField(
+                controller: _fechaController, // Controlador para gestionar la fecha
+                labelText: 'Fecha de transacción', // Etiqueta del campo
+                labelStyle: const TextStyle(color: Colors.black), // Texto en color negro
+                backgroundColor: Colors.white, // Fondo blanco del campo
+                initialDate: _fechaSeleccionada ?? DateTime.now(), // Fecha inicial
+                onChanged: (selectedDate) {
+                  setState(() {
+                    _fechaSeleccionada = selectedDate; // Actualiza la fecha seleccionada
+                    _fechaController.text = DateFormat.yMd().format(selectedDate); // Formatea la fecha seleccionada
+                  });
+                },
+              ),
+              ],
           ),
         ),
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: Text('Cancelar'),
-        ),
-        ElevatedButton(
-          onPressed: _isLoading
-              ? null
-              : () async {
-                  if (_formKey.currentState!.validate()) {
-                    setState(() {
-                      _isLoading = true;
-                    });
+    ),
+    actions: [
+  TextButton(
+    onPressed: () => Navigator.pop(context),
+    child: const Text(
+      'Cancelar',
+      style: TextStyle(color: Colors.white), // Texto blanco
+    ),
+  ),
+  // Aquí añadimos la columna para el botón o la barra de carga
+  Column(
+    mainAxisSize: MainAxisSize.min, // Asegura que no ocupe más espacio del necesario
+    children: [
+      _isLoading
+          ? const CircularProgressIndicator() // Muestra la barra de carga
+          : ElevatedButton(
+              style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(const Color(0xFF5DA6A7)), // Fondo verde
+                  shape: MaterialStateProperty.all(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0), // Bordes redondeados
+                    ),
+                  ),
+                ),
+              onPressed: () async {
+                setState(() {
+                  _isLoading = true; // Muestra el indicador de carga
+                });
 
-                    // Crear nueva transacción
-                    final nuevaTransaccion = Transaccion(
-                      id: '',
-                      user_id: FirebaseAuth.instance.currentUser!.uid,
-                      nombre: _nombreController.text.trim(),
-                      categoria_id: _categoriaSeleccionada!,
-                      descripcion: _descripcionController.text.trim(),
-                      fecha: _fechaSeleccionada!,
-                      ingreso: _ingreso,
-                      monto: double.parse(_montoController.text.trim()),
-                      cuenta_id: _cuentaSeleccionada!,
+                // Verifica si el monto está vacío o no es válido
+                if (_montoController.text.isEmpty ||
+                    double.tryParse(_montoController.text) == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Por favor ingresa un monto válido.'),
+                    ),
+                  );
+                  setState(() {
+                    _isLoading = false; // Ocultar el indicador si el monto no es válido
+                  });
+                  return;
+                }
+
+                if (_formKey.currentState!.validate()) {
+                  final nuevaTransaccion = Transaccion(
+                    id: '',
+                    user_id: FirebaseAuth.instance.currentUser!.uid,
+                    nombre: _nombreController.text,
+                    categoria_id: _categoriaSeleccionada!,
+                    descripcion: _descripcionController.text,
+                    fecha: _fechaSeleccionada!,
+                    ingreso: _ingreso,
+                    monto: double.parse(_montoController.text),
+                    cuenta_id: _cuentaSeleccionada!,
+                  );
+
+                  try {
+                    // Obtener la cuenta seleccionada
+                    final cuentaSeleccionada = _cuentas.firstWhere(
+                      (cuenta) => cuenta.idCuenta == _cuentaSeleccionada,
                     );
 
-                    try {
-                      // Obtener la cuenta seleccionada
-                      final cuentaSeleccionada = _cuentas.firstWhere(
-                          (cuenta) => cuenta.idCuenta == _cuentaSeleccionada);
+                    // Calcular el nuevo saldo
+                    double nuevoSaldo = _ingreso
+                        ? cuentaSeleccionada.saldo +
+                            double.parse(_montoController.text)
+                        : cuentaSeleccionada.saldo -
+                            double.parse(_montoController.text);
 
-                      // Calcular el nuevo saldo
-                      double nuevoSaldo = _ingreso
-                          ? cuentaSeleccionada.saldo +
-                              double.parse(_montoController.text)
-                          : cuentaSeleccionada.saldo -
-                              double.parse(_montoController.text);
+                    // Crear una copia de la cuenta con el nuevo saldo
+                    final cuentaModificada = Cuenta(
+                      idCuenta: cuentaSeleccionada.idCuenta,
+                      nombre: cuentaSeleccionada.nombre,
+                      saldo: nuevoSaldo,
+                      userEmail: cuentaSeleccionada.userEmail,
+                      fechaCreacion: cuentaSeleccionada.fechaCreacion,
+                      tipo: cuentaSeleccionada.tipo,
+                      tipoMoneda: cuentaSeleccionada.tipoMoneda,
+                    );
 
-                      // Modificar cuenta con el nuevo saldo
-                      final cuentaModificada = Cuenta(
-                        idCuenta: cuentaSeleccionada.idCuenta,
-                        nombre: cuentaSeleccionada.nombre,
-                        saldo: nuevoSaldo,
-                        userEmail: cuentaSeleccionada.userEmail,
-                        fechaCreacion: cuentaSeleccionada.fechaCreacion,
-                        tipo: cuentaSeleccionada.tipo,
-                        tipoMoneda: cuentaSeleccionada.tipoMoneda,
-                      );
+                    // Modificar la cuenta en Firestore
+                    await Provider.of<CuentaController>(context, listen: false)
+                        .modificarCuenta(cuentaModificada);
 
-                      // Actualizar cuenta en Firestore
-                      await Provider.of<CuentaController>(context,
-                              listen: false)
-                          .modificarCuenta(cuentaModificada);
+                    // Agregar la transacción
+                    await _controller.agregarTransaccion(nuevaTransaccion);
 
-                      // Guardar transacción en Firestore
-                      await _controller.agregarTransaccion(nuevaTransaccion);
+                    // Mostrar un mensaje de éxito
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Transacción agregada')),
+                    );
 
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Transacción agregada')),
-                      );
-
-                      Navigator.pop(context); // Cierra el diálogo
-                    } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                            content:
-                                Text('Error al agregar la transacción: $e')),
-                      );
-                      print('Error al agregar: $e');
-                    } finally {
-                      setState(() {
-                        _isLoading = false;
-                      });
-                    }
+                    // Navegar al home y reiniciar el formulario
+                    Navigator.pushReplacementNamed(context, '/home');
+                    _formKey.currentState!.reset();
+                    setState(() {
+                      _fechaSeleccionada = null;
+                      _categoriaSeleccionada = null;
+                      _cuentaSeleccionada = null;
+                      _montoController.clear();
+                      _nombreController.clear();
+                      _descripcionController.clear();
+                    });
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Error al agregar transacción: $e'),
+                      ),
+                    );
+                  } finally {
+                    setState(() {
+                      _isLoading = false; // Ocultar el indicador de carga
+                    });
                   }
-                },
-          child: Text('Guardar'),
-        ),
-      ],
-    );
-  }
+                } else {
+                  setState(() {
+                    _isLoading = false; // Ocultar el indicador de carga si la validación falla
+                  });
+                }
+              },
+              child: const Text(
+                'Agregar',
+                style: TextStyle(color: Colors.white), // Texto blanco
+              ),
+            ),
+    ],
+  ),
+],
+
+  );
+}
 }

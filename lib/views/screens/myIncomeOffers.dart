@@ -501,9 +501,14 @@ void _showAddIncomeOfferDialog(BuildContext context, UserController userControll
         builder: (BuildContext context, StateSetter setState) {
           return AlertDialog(
             backgroundColor: const Color(0xFF2E4A5A), // Fondo azul oscuro
-            title: const Text(
-              'Publicar Oferta de Ingreso',
-              style: TextStyle(color: Colors.white), // Título en blanco
+            title: const Center(
+              child: Text(
+                'Publicar Oferta de Ingreso',
+                style: TextStyle(
+                  color: Colors.white, // Texto blanco
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
             content: SizedBox(
               width: MediaQuery.of(context).size.width * 0.9, // Ancho ajustado

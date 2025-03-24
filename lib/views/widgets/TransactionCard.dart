@@ -141,9 +141,14 @@ class TransactionCard extends StatelessWidget {
         builder: (BuildContext context, StateSetter setState) {
           return AlertDialog(
             backgroundColor: const Color(0xFF2E4A5A), // Fondo azul
-            title: const Text(
+             title: const Center(
+              child: Text(
               "Confirmar eliminación",
-              style: TextStyle(color: Colors.white), // Texto blanco
+                style: TextStyle(
+                  color: Colors.white, // Texto blanco
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
             content: _isLoading
                 ? const Center(child: CircularProgressIndicator())
@@ -227,9 +232,14 @@ void _showEditTransactionDialog(BuildContext context, Transaccion transaction) {
         builder: (BuildContext context, StateSetter setState) {
           return AlertDialog(
             backgroundColor: const Color(0xFF2E4A5A), // Fondo azul
-            title: const Text(
+            title: const Center(
+              child: Text(
               'Editar Transacción',
-              style: TextStyle(color: Colors.white), // Texto blanco
+                style: TextStyle(
+                  color: Colors.white, // Texto blanco
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
             content: SizedBox(
               width: MediaQuery.of(context).size.width * 0.9, // Ancho ajustado
