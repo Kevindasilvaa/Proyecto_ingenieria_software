@@ -5,7 +5,6 @@ import 'package:moni/controllers/user_controller.dart';
 import 'package:moni/models/clases/cuenta.dart';
 import 'package:moni/views/widgets/CustomDrawer.dart';
 import 'package:moni/views/widgets/NavBar.dart';
-import 'package:moni/views/widgets/AddAccountButton.dart';
 import 'package:provider/provider.dart';
 
 class AccountsPage extends StatefulWidget {

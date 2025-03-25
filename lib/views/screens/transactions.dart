@@ -9,7 +9,6 @@ import 'package:moni/views/widgets/NavBar.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
-import 'package:moni/views/widgets/EditTransaction.dart';
 import 'package:moni/views/widgets/TransactionCard.dart'; // Importa el widget TransactionCard
 import 'package:moni/views/widgets/AddTransactionDialog.dart'; // Importa el cuadro de diálogo
 

@@ -7,7 +7,6 @@ import 'package:moni/models/clases/transaccion.dart';
 import 'package:intl/intl.dart';
 import 'package:moni/views/widgets/CustomDropdown.dart';
 import 'package:moni/views/widgets/DatePickerField.dart';
-import 'package:moni/views/widgets/EditTransaction.dart';
 
 class TransactionCard extends StatelessWidget {
   final Transaccion transaccion;
