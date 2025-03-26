@@ -5,6 +5,7 @@ import 'package:moni/models/clases/income_offers.dart';
 import 'package:moni/controllers/user_controller.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class IncomeOffersPage extends StatefulWidget {
   @override
@@ -141,6 +142,7 @@ class _IncomeOffersPageState extends State<IncomeOffersPage> {
                     return IconButton(
                       icon: Icon(
                         isSaved ? Icons.bookmark : Icons.bookmark_border,
+                        color: const Color(0xFF2E4A5A),
                       ),
                       onPressed: () async {
                         if (isSaved) {
@@ -156,7 +158,7 @@ class _IncomeOffersPageState extends State<IncomeOffersPage> {
                     return IconButton(
                       icon: Icon(
                         Icons.bookmark_border,
-                        color: Colors.yellow[700],
+                        color: const Color(0xFF2E4A5A),
                       ),
                       onPressed: () async {
                         await _addOfferToSaved(
@@ -202,7 +204,30 @@ class _IncomeOffersPageState extends State<IncomeOffersPage> {
                         color: Colors.blueAccent,
                       ),
                     ),
+                    
                   ],
+                  
+                ),
+                
+              ),
+              SizedBox(width: 6),
+          //     ElevatedButton(
+          //   onPressed: () => _launchEmail(incomeOffer.email, incomeOffer.titulo),
+          //   child: Text('Aplicar'),
+          // ),
+          ElevatedButton(
+                onPressed: () => _launchEmail(incomeOffer.email, incomeOffer.titulo),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF5DA6A7), // Fondo verde
+                  foregroundColor: const Color.fromARGB(255, 255, 255, 255),
+                  padding: EdgeInsets.symmetric(vertical: 9, horizontal: 32),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                child: Text(
+                  'Aplicar',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ),
             ],
@@ -211,6 +236,34 @@ class _IncomeOffersPageState extends State<IncomeOffersPage> {
       ),
     );
   }
+
+  Future<void> _launchEmail(String email, String tituloOferta) async {
+  final Uri emailLaunchUri = Uri(
+    scheme: 'mailto',
+    path: email,
+    queryParameters: {
+      'subject': '$tituloOferta',
+    },
+  );
+
+  if (await canLaunchUrl(emailLaunchUri)) {
+    if (!await launchUrl(emailLaunchUri)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('No se pudo abrir el cliente de correo.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('No se pudo abrir el cliente de correo.'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+}
 
   Future<void> _addOfferToSaved(BuildContext context, String offerId) async {
     final userController = Provider.of<UserController>(context, listen: false);

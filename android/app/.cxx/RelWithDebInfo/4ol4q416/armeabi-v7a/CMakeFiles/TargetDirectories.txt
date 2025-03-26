@@ -1,0 +1,2 @@
+C:/Users/Liz/Desktop/flutter2/Proyecto_ingenieria_software/android/app/.cxx/RelWithDebInfo/4ol4q416/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/Liz/Desktop/flutter2/Proyecto_ingenieria_software/android/app/.cxx/RelWithDebInfo/4ol4q416/armeabi-v7a/CMakeFiles/rebuild_cache.dir
