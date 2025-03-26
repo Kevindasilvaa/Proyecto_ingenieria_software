@@ -49,8 +49,8 @@ class ArticleCard extends StatelessWidget {
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      Color(0xFF69BFA0),
-                      Color(0xFFF2F2F2),
+                      Color.fromARGB(255, 174, 226, 227),
+                      Color(0xFF5DA6A7),
                     ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -67,8 +67,8 @@ class ArticleCard extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: const LinearGradient(
               colors: [
-                Color(0xFF69BFA0),
-                Color(0xFFF2F2F2),
+                Color.fromARGB(255, 174, 226, 227),
+                Color(0xFF5DA6A7),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -96,7 +96,7 @@ class ArticleCard extends StatelessWidget {
                     fit: BoxFit.cover,
                   ),
                 ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 10),
               Center(
                 child: Text(
                   article.titulo,
@@ -114,7 +114,8 @@ class ArticleCard extends StatelessWidget {
                   child: Text(
                     article.resumen,
                     textAlign: TextAlign.justify,
-                    style: const TextStyle(fontSize: 14, color: Colors.black87),
+                    style:
+                        const TextStyle(fontSize: 14, color: Color(0xFF1B4E59)),
                   ),
                 ),
               ),

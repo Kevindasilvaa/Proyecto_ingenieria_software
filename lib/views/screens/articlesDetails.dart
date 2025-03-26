@@ -26,8 +26,8 @@ class ArticleDetailPage extends StatelessWidget {
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      Color(0xFF69BFA0),
-                      Color(0xFFF2F2F2),
+                      Color.fromARGB(255, 174, 226, 227),
+                      Color(0xFF5DA6A7),
                     ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -45,7 +45,7 @@ class ArticleDetailPage extends StatelessWidget {
                           article.titulo,
                           textAlign: TextAlign.center,
                           style: const TextStyle(
-                            fontSize: 26,
+                            fontSize: 20,
                             fontWeight: FontWeight.bold,
                             color: Color(0xFF1B4E59),
                           ),
@@ -68,7 +68,7 @@ class ArticleDetailPage extends StatelessWidget {
                         textAlign: TextAlign.justify,
                         style: const TextStyle(
                           fontSize: 16,
-                          color: Colors.black87,
+                          color: Color(0xFF1B4E59),
                         ),
                       ),
                     ],

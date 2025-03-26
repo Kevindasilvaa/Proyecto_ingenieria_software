@@ -17,11 +17,22 @@ class _IncomeOffersPageState extends State<IncomeOffersPage> {
   @override
   void initState() {
     super.initState();
+
     // Cargar las ofertas cuando se inicia la página
     final incomeOffersController =
         Provider.of<IncomeOffersController>(context, listen: false);
-    incomeOffersController
-        .cargarTodasLasIncomeOffers(); // Asegúrate de que este método está definido en tu controlador
+    final userController = Provider.of<UserController>(context, listen: false);
+
+    // Obtener el correo del usuario actual
+    final userEmail = userController.usuario?.email;
+
+    if (userEmail != null) {
+      // Cargar solo las ofertas que no fueron publicadas por el usuario actual
+      incomeOffersController.cargarIncomeOffersSinPublicadasPorMi(userEmail);
+    } else {
+      // Si no hay un usuario autenticado, cargar todas las ofertas como fallback
+      incomeOffersController.cargarTodasLasIncomeOffers();
+    }
   }
 
   @override
