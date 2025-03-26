@@ -184,7 +184,7 @@ import 'package:flutter/material.dart';
 import 'package:moni/controllers/category_controller.dart';
 import 'package:moni/controllers/transaccion_controller.dart';
 import 'package:moni/models/clases/transaccion.dart';
-import 'package:moni/views/widgets/TransactionCard.dart';  // Importamos el widget TransactionCard
+import 'package:moni/views/widgets/TransactionCard.dart'; // Importamos el widget TransactionCard
 
 class RecentTransactionsView extends StatelessWidget {
   final TransaccionesController _controller = TransaccionesController();
@@ -205,7 +205,7 @@ class RecentTransactionsView extends StatelessWidget {
           final transacciones = snapshot.data!;
 
           transacciones.sort((a, b) => b.fecha.compareTo(a.fecha));
-          final ultimasTransacciones = transacciones.take(3).toList();
+          final ultimasTransacciones = transacciones.take(5).toList();
 
           return ListView.builder(
             itemCount: ultimasTransacciones.length,

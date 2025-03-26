@@ -34,8 +34,8 @@ class CategoriesPage extends StatelessWidget {
                 onPressed: () =>
                     _showCreateCategoryDialog(context, categoryController),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey[300],
-                  foregroundColor: Colors.black,
+                  backgroundColor: const Color(0xFF5DA6A7), // Fondo verde
+                  foregroundColor: const Color.fromARGB(255, 255, 255, 255),
                   padding: EdgeInsets.symmetric(vertical: 14, horizontal: 32),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
@@ -99,72 +99,81 @@ class CategoriesPage extends StatelessWidget {
   }
 
   void _showDeleteConfirmationDialog(BuildContext context,
-    CategoryController categoryController, String categoryId) {
-  categoryController.getCategoryById(categoryId).then((category) {
-    if (category?.user_email == 'all_users@domain.com') {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('No puedes eliminar una categoría global.'),
-        ),
-      );
-    } else {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            backgroundColor: const Color(0xFF2E4A5A), // Fondo azul
-            title: const Text(
-              'Eliminar Categoría',
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold), // Texto blanco
-            ),
-            content: const Text(
-              '¿Seguro que deseas eliminar esta categoría?',
-              style: TextStyle(color: Colors.white), // Texto blanco
-            ),
-            actions: [
-              TextButton(
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(Colors.transparent), // Fondo transparente
-                ),
-                onPressed: () => Navigator.pop(context),
-                child: const Text(
-                  'Cancelar',
-                  style: TextStyle(color: Colors.white), // Texto blanco
-                ),
+      CategoryController categoryController, String categoryId) {
+    categoryController.getCategoryById(categoryId).then((category) {
+      if (category?.user_email == 'all_users@domain.com') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No puedes eliminar una categoría global.'),
+          ),
+        );
+      } else {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              backgroundColor: const Color(0xFF2E4A5A), // Fondo azul
+              title: const Text(
+                'Eliminar Categoría',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold), // Texto blanco
               ),
-              TextButton(
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(const Color(0xFFF44336)), // Fondo rojo
-                  shape: MaterialStateProperty.all(
-                    RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0), // Bordes redondeados
-                    ),
+              content: const Text(
+                '¿Seguro que deseas eliminar esta categoría?',
+                style: TextStyle(color: Colors.white), // Texto blanco
+              ),
+              actions: [
+                TextButton(
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(
+                        Colors.transparent), // Fondo transparente
+                  ),
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text(
+                    'Cancelar',
+                    style: TextStyle(color: Colors.white), // Texto blanco
                   ),
                 ),
-                onPressed: () {
-                  categoryController.deleteCategory(categoryId).then((_) {
-                    Navigator.pop(context); // Cerrar el diálogo
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Categoría eliminada exitosamente.')),
-                    );
-                  }).catchError((error) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Error al eliminar la categoría.')),
-                    );
-                  });
-                },
-                child: const Text(
-                  'Eliminar',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold), // Texto blanco
+                TextButton(
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(
+                        const Color(0xFFF44336)), // Fondo rojo
+                    shape: MaterialStateProperty.all(
+                      RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(8.0), // Bordes redondeados
+                      ),
+                    ),
+                  ),
+                  onPressed: () {
+                    categoryController.deleteCategory(categoryId).then((_) {
+                      Navigator.pop(context); // Cerrar el diálogo
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text('Categoría eliminada exitosamente.')),
+                      );
+                    }).catchError((error) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text('Error al eliminar la categoría.')),
+                      );
+                    });
+                  },
+                  child: const Text(
+                    'Eliminar',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold), // Texto blanco
+                  ),
                 ),
-              ),
-            ],
-          );
-        },
-      );
-    }
-  });
-}
+              ],
+            );
+          },
+        );
+      }
+    });
+  }
 }
 
 class CreateCategoryDialog extends StatefulWidget {
@@ -232,7 +241,8 @@ class _CreateCategoryDialogState extends State<CreateCategoryDialog> {
                 labelText: 'Nombre',
                 labelStyle: TextStyle(color: Colors.black), // Texto negro
                 border: InputBorder.none,
-                prefixIcon: Icon(Icons.category, color: Colors.black), // Ícono negro
+                prefixIcon:
+                    Icon(Icons.category, color: Colors.black), // Ícono negro
                 contentPadding: EdgeInsets.all(16.0),
               ),
             ),
@@ -294,7 +304,9 @@ class _CreateCategoryDialogState extends State<CreateCategoryDialog> {
                     color: color,
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: selectedColor == color ? Colors.black : Colors.transparent,
+                      color: selectedColor == color
+                          ? Colors.black
+                          : Colors.transparent,
                       width: 2,
                     ),
                   ),
@@ -322,17 +334,18 @@ class _CreateCategoryDialogState extends State<CreateCategoryDialog> {
                 backgroundColor: const Color(0xFF5DA6A7), // Fondo verde
                 foregroundColor: Colors.white, // Texto blanco
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.0), // Bordes redondeados
+                  borderRadius:
+                      BorderRadius.circular(8.0), // Bordes redondeados
                 ),
               ),
               onPressed: () {
                 if (widget.nameController.text.isNotEmpty) {
                   widget.categoryController
                       .addCategory(
-                        widget.nameController.text,
-                        selectedIcon,
-                        selectedColor,
-                      )
+                    widget.nameController.text,
+                    selectedIcon,
+                    selectedColor,
+                  )
                       .then((_) {
                     Navigator.pop(context);
                   });

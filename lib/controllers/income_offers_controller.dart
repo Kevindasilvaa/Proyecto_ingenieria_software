@@ -95,4 +95,16 @@ class IncomeOffersController with ChangeNotifier {
     }
     notifyListeners(); // Notifica a la vista que los datos han cambiado
   }
+
+  Future<void> cargarIncomeOffersSinPublicadasPorMi(String userEmail) async {
+    try {
+      final todasLasOfertas = await _firebaseService.obtenerTodasIncomeOffers();
+      _incomeOffers = todasLasOfertas
+          .where((offer) => offer.email != userEmail) // Filtra las ofertas
+          .toList();
+      notifyListeners(); // Notifica a la vista que los datos han cambiado
+    } catch (e) {
+      print('Error al filtrar ofertas: $e');
+    }
+  }
 }
